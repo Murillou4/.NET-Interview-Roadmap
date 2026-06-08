@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { StudyTerm, StudyStatus } from '../types';
+import React, { useEffect, useState } from 'react';
 import {
-  CheckCircle,
-  HelpCircle,
-  Clock,
-  ArrowRight,
-  ChevronLeft,
   AlertTriangle,
-  Flame,
-  Code,
-  Sparkles,
+  ArrowRight,
   Award,
-  ThumbsUp
+  CheckCircle,
+  ChevronLeft,
+  Clock,
+  Code,
+  HelpCircle,
+  Sparkles,
+  ThumbsUp,
 } from 'lucide-react';
+import { StudyStatus, StudyTerm } from '../types';
 
 interface TermDetailProps {
   term: StudyTerm;
@@ -24,6 +23,19 @@ interface TermDetailProps {
   onBack: () => void;
 }
 
+const getStatusStyles = (status: StudyStatus) => {
+  switch (status) {
+    case 'aprendido':
+      return 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300';
+    case 'revisar':
+      return 'border-amber-400/25 bg-amber-400/10 text-amber-300';
+    case 'estudando':
+      return 'border-teal-400/25 bg-teal-400/10 text-teal-300';
+    default:
+      return 'border-white/[0.08] bg-white/[0.03] text-neutral-400';
+  }
+};
+
 export const TermDetail: React.FC<TermDetailProps> = ({
   term,
   status,
@@ -31,9 +43,8 @@ export const TermDetail: React.FC<TermDetailProps> = ({
   onUpdateStatus,
   onUpdateConfidence,
   onNext,
-  onBack
+  onBack,
 }) => {
-  // Reset quiz selection state when changing terms
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'interview' | 'code' | 'quiz'>('info');
@@ -46,343 +57,329 @@ export const TermDetail: React.FC<TermDetailProps> = ({
 
   const handleSelectOption = (index: number) => {
     if (quizAnswered) return;
+
     setSelectedOption(index);
     setQuizAnswered(true);
-    
-    // Automatically flag as studied or studying upon taking the quiz
+
     if (status === 'não estudado') {
       onUpdateStatus(term.id, 'estudando');
     }
   };
 
-  const getDifficultyColor = (level: string) => {
-    switch (level) {
-      case 'básico':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-      case 'intermediário':
-        return 'bg-orange-400/10 text-orange-400 border-orange-450/20';
-      case 'avançado':
-        return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-      default:
-        return 'bg-sky-500/10 text-sky-400 border-sky-500/20';
-    }
-  };
-
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl max-w-4xl mx-auto my-4 transition-all animate-fadeIn font-sans">
-      {/* Header Bar */}
-      <div className="bg-slate-950 p-6 border-b border-slate-850 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2 bg-slate-900 text-slate-300 hover:text-slate-100 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-            title="Voltar"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className={`text-[10px] font-bold font-mono tracking-wider uppercase border px-2 py-0.5 rounded-full ${getDifficultyColor(term.level)}`}>
+    <section className="overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.03] shadow-2xl animate-fadeIn">
+      <div className="border-b border-white/[0.08] p-5 md:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm font-semibold text-neutral-300 transition hover:bg-white/[0.06] hover:text-neutral-100"
+              title="Voltar"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Voltar
+            </button>
+
+            <div className="flex flex-wrap gap-2">
+              <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                {status}
+              </span>
+              <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-300">
                 {term.level}
               </span>
-              <span className="text-[10px] bg-slate-900 text-slate-400 border border-slate-850 px-2.5 py-0.5 rounded-full">
+              <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-300">
                 {term.category}
               </span>
-              {status === 'aprendido' && (
-                <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded-full flex items-center gap-1 font-semibold">
-                  <CheckCircle className="w-3 h-3" /> Aprendido
-                </span>
-              )}
-              {status === 'revisar' && (
-                <span className="text-[10px] bg-orange-500/10 text-orange-400 border border-orange-500/25 px-2 py-0.5 rounded-full flex items-center gap-1 font-semibold">
-                  <Clock className="w-3 h-3" /> Revisar
-                </span>
-              )}
-              {status === 'estudando' && (
-                <span className="text-[10px] bg-sky-500/10 text-sky-400 border border-sky-500/25 px-2 py-0.5 rounded-full flex items-center gap-1 font-semibold animate-pulse">
-                  <Flame className="w-3 h-3 text-sky-400" /> Estudando
-                </span>
-              )}
             </div>
-            <h2 className="text-2xl font-black text-slate-150 tracking-tight">{term.name}</h2>
-          </div>
-        </div>
 
-        {/* Confidence ratings selector */}
-        <div className="flex flex-col items-start md:items-end gap-1 font-sans">
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">Confiança Técnico (1 a 5)</p>
-          <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5].map((stars) => (
-              <button
-                key={stars}
-                onClick={() => onUpdateConfidence(term.id, stars)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold font-mono text-xs border transition-all cursor-pointer ${
-                  confidence >= stars
-                    ? 'bg-sky-500 text-slate-950 border-sky-500 transform scale-110 shadow-md shadow-sky-550/10'
-                    : 'bg-slate-955 text-slate-400 border-slate-800 hover:text-slate-100 hover:border-slate-700'
-                }`}
-                title={`Confiança ${stars}/5`}
-              >
-                {stars}
-              </button>
-            ))}
+            <div className="space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Termo em foco</p>
+              <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{term.name}</h2>
+              <p className="max-w-3xl text-sm leading-6 text-neutral-400">
+                Estude em blocos curtos. Cada aba mantém o conteúdo direto para não cansar no celular.
+              </p>
+            </div>
           </div>
-          <p className="text-[9px] text-slate-500 font-mono">
-            {confidence === 0 && 'Clique para avaliar'}
-            {confidence === 1 && '1 - Não sei explicar na entrevista'}
-            {confidence === 2 && '2 - Lembro do nome em parte'}
-            {confidence === 3 && '3 - Sei usar no dia a dia'}
-            {confidence === 4 && '4 - Explico bem na sabatina'}
-            {confidence === 5 && '5 - Dou aula sobre o conceito'}
-          </p>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-4 md:min-w-[20rem]">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Confiança técnica</p>
+            <div className="mt-3 grid grid-cols-5 gap-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => onUpdateConfidence(term.id, value)}
+                  className={`flex h-10 items-center justify-center rounded-xl border text-sm font-semibold transition ${
+                    confidence >= value
+                      ? 'border-teal-400/25 bg-teal-400 text-neutral-950'
+                      : 'border-white/[0.08] bg-white/[0.03] text-neutral-400 hover:border-white/[0.12] hover:text-neutral-100'
+                  }`}
+                  title={`Confiança ${value}/5`}
+                  aria-label={`Confiança ${value} de 5`}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-neutral-500">
+              {confidence === 0 && 'Toque para avaliar.'}
+              {confidence === 1 && '1 - ainda não consigo explicar.'}
+              {confidence === 2 && '2 - lembro do nome e pouco mais.'}
+              {confidence === 3 && '3 - uso no dia a dia.'}
+              {confidence === 4 && '4 - explico com segurança.'}
+              {confidence === 5 && '5 - consigo ensinar o conceito.'}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Tabs navigation content */}
-      <div className="flex border-b border-slate-850 bg-slate-950">
-        <button
-          onClick={() => setActiveTab('info')}
-          className={`flex-1 py-3.5 text-xs md:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            activeTab === 'info'
-              ? 'text-sky-400 border-b-2 border-sky-500 bg-slate-900/40'
-              : 'text-slate-400 hover:text-slate-100'
-          }`}
-        >
-          <Sparkles className="w-4 h-4" /> Conceito Básico
-        </button>
-        <button
-          onClick={() => setActiveTab('interview')}
-          className={`flex-1 py-3.5 text-xs md:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            activeTab === 'interview'
-              ? 'text-sky-400 border-b-2 border-sky-500 bg-slate-900/40'
-              : 'text-slate-400 hover:text-slate-100'
-          }`}
-        >
-          <Award className="w-4 h-4" /> Na Entrevista
-        </button>
-        <button
-          onClick={() => setActiveTab('code')}
-          className={`flex-1 py-3.5 text-xs md:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            activeTab === 'code'
-              ? 'text-sky-400 border-b-2 border-sky-500 bg-slate-900/40'
-              : 'text-slate-400 hover:text-slate-100'
-          }`}
-        >
-          <Code className="w-4 h-4" /> Uso Prático & Código
-        </button>
-        <button
-          onClick={() => setActiveTab('quiz')}
-          className={`flex-1 py-3.5 text-xs md:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            activeTab === 'quiz'
-              ? 'text-sky-400 border-b-2 border-sky-500 bg-slate-900/40'
-              : 'text-slate-400 hover:text-slate-100'
-          }`}
-        >
-          <HelpCircle className="w-4 h-4" /> Desafio Rápido
-        </button>
+      <div className="border-b border-white/[0.08] bg-white/[0.02]">
+        <div className="flex gap-2 overflow-x-auto px-4 py-3 md:px-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab('info')}
+            className={`inline-flex min-w-max items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              activeTab === 'info' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
+            }`}
+          >
+            <Sparkles className="h-4 w-4" />
+            Resumo
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('interview')}
+            className={`inline-flex min-w-max items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              activeTab === 'interview' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
+            }`}
+          >
+            <Award className="h-4 w-4" />
+            Entrevista
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('code')}
+            className={`inline-flex min-w-max items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              activeTab === 'code' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
+            }`}
+          >
+            <Code className="h-4 w-4" />
+            Código
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('quiz')}
+            className={`inline-flex min-w-max items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              activeTab === 'quiz' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
+            }`}
+          >
+            <HelpCircle className="h-4 w-4" />
+            Quiz
+          </button>
+        </div>
       </div>
 
-      {/* Dynamic Tab Body content */}
-      <div className="p-6 md:p-8 space-y-6">
-        {activeTab === 'info' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* O Que É? */}
-            <div className="bg-slate-950 p-5 rounded-xl border border-slate-850">
-              <h3 className="text-xs font-bold text-sky-400 uppercase tracking-widest font-mono mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                1. O que é?
-              </h3>
-              <p className="text-slate-300 text-sm leading-relaxed">{term.simpleExplanation}</p>
-            </div>
+      <div className="space-y-5 p-5 md:p-6">
+        {activeTab === 'info' ? (
+          <div className="space-y-4 animate-fadeIn">
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">1. O que é?</p>
+              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.simpleExplanation}</p>
+            </section>
 
-            {/* Pra Que Serve? */}
-            <div className="bg-slate-950 p-5 rounded-xl border border-slate-850">
-              <h3 className="text-xs font-bold text-sky-400 uppercase tracking-widest font-mono mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                2. Pra que serve no Backend?
-              </h3>
-              <p className="text-slate-300 text-sm leading-relaxed">{term.interviewExplanation}</p>
-            </div>
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">2. Pra que serve?</p>
+              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.interviewExplanation}</p>
+            </section>
 
-            {/* Quando usar */}
-            <div className="bg-slate-950/40 p-5 rounded-xl border border-slate-850/60">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono mb-1">Quando usar em projetos?</h4>
-              <p className="text-xs text-slate-450 leading-relaxed">{term.whenToUse}</p>
-            </div>
+            <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Quando usar</p>
+              <p className="mt-3 text-sm leading-6 text-neutral-400">{term.whenToUse}</p>
+            </section>
           </div>
-        )}
+        ) : null}
 
-        {activeTab === 'interview' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* Como Responder na Entrevista */}
-            <div className="bg-gradient-to-r from-slate-950 via-slate-950 to-slate-900 p-5 rounded-xl border-l-4 border-orange-500 border-t border-r border-b border-slate-850">
-              <h3 className="text-xs font-bold text-orange-400 uppercase tracking-widest font-mono mb-2 flex items-center gap-2">
-                <ThumbsUp className="w-4 h-4 text-orange-400" />
-                3. Resposta Direta & Natural (Júnior)
-              </h3>
-              <p className="text-slate-300 text-sm leading-relaxed italic">
-                "{term.shortInterviewAnswer}"
-              </p>
-            </div>
+        {activeTab === 'interview' ? (
+          <div className="space-y-4 animate-fadeIn">
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Pergunta comum</p>
+              <p className="mt-3 text-sm leading-6 text-neutral-200">{term.interviewQuestion}</p>
+            </section>
 
-            {/* Resposta Mais Forte / Pleno */}
-            <div className="bg-gradient-to-r from-slate-950 via-slate-950 to-slate-900 p-5 rounded-xl border-l-4 border-sky-400 border-t border-r border-b border-slate-850">
-              <h3 className="text-xs font-bold text-sky-450 uppercase tracking-widest font-mono mb-2 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-sky-400" />
-                4. Resposta de Impacto / Pleno (+ Termos Técnicos)
-              </h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                {term.betterInterviewAnswer}
-              </p>
-            </div>
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <div className="flex items-center gap-2">
+                <ThumbsUp className="h-4 w-4 text-amber-300" />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300">Resposta curta</p>
+              </div>
+              <p className="mt-3 text-sm leading-6 italic text-neutral-300">"{term.shortInterviewAnswer}"</p>
+            </section>
 
-            {/* Erros comuns a se evitar */}
-            <div className="bg-orange-500/5 p-5 rounded-xl border border-orange-500/15">
-              <h4 className="text-xs font-bold text-orange-400 uppercase tracking-widest font-mono mb-2 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-orange-400" /> Erros clássicos para evitar citar na sabatina:
-              </h4>
-              <ul className="list-disc list-inside space-y-1.5 text-xs text-slate-300">
-                {term.commonErrors.map((err, i) => (
-                  <li key={i} className="leading-relaxed">{err}</li>
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-teal-300" />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Resposta de impacto</p>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.betterInterviewAnswer}</p>
+            </section>
+
+            <section className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] p-5">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-300" />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300">Erros comuns</p>
+              </div>
+              <ul className="mt-3 space-y-2 text-sm text-neutral-300">
+                {term.commonErrors.map((error, index) => (
+                  <li key={index} className="flex gap-2 leading-6">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300" />
+                    <span>{error}</span>
+                  </li>
                 ))}
               </ul>
-            </div>
+            </section>
           </div>
-        )}
+        ) : null}
 
-        {activeTab === 'code' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-between animate-fadeIn">
-              <h3 className="text-xs font-bold text-sky-450 uppercase tracking-widest font-mono">
-                Exemplo do Mundo Real (.NET C#)
-              </h3>
-              <span className="text-[10px] text-slate-500 font-mono">C# strongly-typed</span>
-            </div>
-
-            <div className="bg-slate-955 p-5 rounded-xl border border-slate-850 overflow-x-auto">
-              <pre className="text-xs md:text-sm font-mono text-sky-400 leading-relaxed">
+        {activeTab === 'code' ? (
+          <div className="space-y-4 animate-fadeIn">
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Exemplo real</p>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">C# strongly typed</span>
+              </div>
+              <pre className="mt-4 overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#071018] p-4 text-sm leading-6 text-teal-200">
                 <code>{term.practicalExample}</code>
               </pre>
-            </div>
+            </section>
 
-            {/* Explaining code simply */}
-            <div className="p-4 bg-slate-950/40 rounded-lg">
-              <p className="text-xs text-slate-450">
-                <strong>Análise em português simples:</strong> Observe que o código foca na assinatura direta e limpa do termo. No .NET, evitamos escrever enormes blocos de boilerplate. Integramos tudo no fluxo com injeções limpas de dependências.
+            <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Leitura rápida</p>
+              <p className="mt-3 text-sm leading-6 text-neutral-400">
+                O exemplo acima mostra o caminho mais curto para apresentar o conceito sem enfeite. A ideia é fixar a
+                estrutura e não decorar a parede de boilerplate.
               </p>
-            </div>
+            </section>
           </div>
-        )}
+        ) : null}
 
-        {activeTab === 'quiz' && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="bg-slate-950 p-5 rounded-xl border border-sky-500/15">
-              <div className="flex items-center gap-2 mb-3">
-                <HelpCircle className="w-5 h-5 text-sky-400" />
-                <h4 className="text-sm font-bold text-slate-100">Mini Quiz - Teste seus conhecimentos:</h4>
+        {activeTab === 'quiz' ? (
+          <div className="space-y-4 animate-fadeIn">
+            <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-teal-300" />
+                <h3 className="text-sm font-semibold text-neutral-100">Mini quiz</h3>
               </div>
-              <p className="text-slate-200 text-sm mb-5 font-semibold">
-                {term.quiz.question}
-              </p>
+              <p className="mt-4 text-sm font-semibold leading-6 text-neutral-200">{term.quiz.question}</p>
 
-              {/* Quiz option list */}
-              <div className="space-y-3">
+              <div className="mt-5 space-y-3">
                 {term.quiz.options.map((option, index) => {
-                  let optionStyle = 'bg-slate-900 border-slate-850 text-slate-300 hover:bg-slate-950 hover:text-slate-100';
-                  
+                  let optionStyle = 'border-white/[0.08] bg-white/[0.03] text-neutral-300 hover:border-teal-400/25 hover:text-neutral-100';
+
                   if (quizAnswered) {
                     if (index === term.quiz.answerIndex) {
-                      // Correct option always highlighted green
-                      optionStyle = 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold';
+                      optionStyle = 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300';
                     } else if (selectedOption === index) {
-                      // Wrong selected option highlighted red
-                      optionStyle = 'bg-orange-500/20 border-orange-500 text-orange-400';
+                      optionStyle = 'border-amber-400/25 bg-amber-400/10 text-amber-300';
                     } else {
-                      // Neutral unselected options
-                      optionStyle = 'bg-slate-950/30 border-slate-850 text-slate-650 line-through opacity-55';
+                      optionStyle = 'border-white/[0.06] bg-neutral-950/40 text-neutral-600 opacity-60';
                     }
                   }
 
                   return (
                     <button
                       key={index}
+                      type="button"
                       onClick={() => handleSelectOption(index)}
-                      className={`w-full p-4 rounded-xl text-left text-xs md:text-sm border transition-all duration-150 flex items-center justify-between cursor-pointer ${optionStyle}`}
                       disabled={quizAnswered}
+                      className={`flex w-full items-center justify-between gap-3 rounded-2xl border p-4 text-left text-sm transition ${optionStyle}`}
                     >
                       <span>{option}</span>
-                      {quizAnswered && index === term.quiz.answerIndex && (
-                        <span className="text-[10px] bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded uppercase font-bold font-mono">Gabarito</span>
-                      )}
+                      {quizAnswered && index === term.quiz.answerIndex ? (
+                        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                          Gabarito
+                        </span>
+                      ) : null}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Quiz Explainer (Shows up once answered) */}
-              {quizAnswered && (
-                <div className="mt-5 p-4 bg-slate-900 border border-slate-800 rounded-xl animate-fadeIn">
-                  <p className="text-xs font-bold font-mono uppercase text-sky-400 mb-1">Explicação do Professor:</p>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {term.quiz.explanation}
-                  </p>
-                  <div className="mt-3 flex items-center gap-2">
+              {quizAnswered ? (
+                <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Explicação</p>
+                  <p className="mt-3 text-sm leading-6 text-neutral-300">{term.quiz.explanation}</p>
+                  <div className="mt-4">
                     {selectedOption === term.quiz.answerIndex ? (
-                      <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md font-bold">✓ Resposta Correta! Mandou bem.</span>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        Resposta correta
+                      </span>
                     ) : (
-                      <span className="text-[10px] text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-md font-bold">✗ Resposta Incorreta! Faz parte, veja a explicação e avance.</span>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-300">
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                        Resposta incorreta
+                      </span>
                     )}
                   </div>
                 </div>
-              )}
-            </div>
+              ) : null}
+            </section>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Footer Controls containing Status Checkboxes & Next Slide Button */}
-      <div className="bg-slate-950 p-6 border-t border-slate-850 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Progress marking buttons */}
-        <div className="flex flex-wrap gap-2.5">
-          <button
-            onClick={() => onUpdateStatus(term.id, 'aprendido')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
-              status === 'aprendido'
-                ? 'bg-emerald-500 text-slate-950 border-emerald-500 shadow-lg'
-                : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
-            }`}
-          >
-            <CheckCircle className="w-4 h-4" /> Marcar como aprendido
-          </button>
-          
-          <button
-            onClick={() => onUpdateStatus(term.id, 'revisar')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
-              status === 'revisar'
-                ? 'bg-orange-500 text-slate-950 border-orange-500 shadow-lg'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-100 hover:bg-slate-800'
-            }`}
-          >
-            <Clock className="w-4 h-4" /> Marcar para revisar
-          </button>
-        </div>
+      <div className="border-t border-white/[0.08] p-5 md:p-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onUpdateStatus(term.id, 'aprendido')}
+              className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                status === 'aprendido'
+                  ? 'border-emerald-400/25 bg-emerald-400 text-neutral-950'
+                  : 'border-white/[0.08] bg-white/[0.03] text-neutral-300 hover:bg-white/[0.06]'
+              }`}
+            >
+              <CheckCircle className="h-4 w-4" />
+              Marcar como aprendido
+            </button>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-3 justify-end">
-          <button
-            onClick={onBack}
-            className="text-xs font-bold text-slate-400 hover:text-slate-100 px-4 py-2 transition-colors cursor-pointer"
-          >
-            Focar na Categoria
-          </button>
-          <button
-            onClick={onNext}
-            className="px-5 py-2.5 bg-sky-500 hover:bg-sky-450 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg cursor-pointer"
-          >
-            Próximo Termo <ArrowRight className="w-4 h-4" />
-          </button>
+            <button
+              type="button"
+              onClick={() => onUpdateStatus(term.id, 'revisar')}
+              className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                status === 'revisar'
+                  ? 'border-amber-400/25 bg-amber-400 text-neutral-950'
+                  : 'border-white/[0.08] bg-white/[0.03] text-neutral-300 hover:bg-white/[0.06]'
+              }`}
+            >
+              <Clock className="h-4 w-4" />
+              Marcar para revisar
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-3 md:flex-row">
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-300 transition hover:bg-white/[0.06]"
+            >
+              Voltar à lista
+            </button>
+
+            <button
+              type="button"
+              onClick={onNext}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-teal-400/25 bg-teal-400 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-teal-300 active:scale-[0.99]"
+            >
+              Próximo termo
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

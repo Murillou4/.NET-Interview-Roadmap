@@ -1,61 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { SimulatorQuestion } from '../types';
-import { SIMULATOR_QUESTIONS } from '../data/simulator';
+import React, { useState } from 'react';
 import {
-  HelpCircle,
-  Award,
-  BookOpen,
-  Shuffle,
-  Eye,
-  CheckCircle,
   AlertTriangle,
-  XCircle,
+  BookOpen,
+  CheckCircle,
   CheckCircle2,
+  ChevronRight,
+  Eye,
+  HelpCircle,
+  Shuffle,
   Trophy,
-  Undo
+  XCircle,
 } from 'lucide-react';
+import { SIMULATOR_QUESTIONS } from '../data/simulator';
+import { SimulatorQuestion } from '../types';
 
 interface SimulatorViewProps {
   simulatorPerformance: Record<string, 'errei' | 'mais_ou_menos' | 'acertei'>;
   onUpdatePerformance: (questionId: string, performance: 'errei' | 'mais_ou_menos' | 'acertei') => void;
+  onResetPerformance: () => void;
   onSelectTermById: (termId: string) => void;
 }
 
 export const SimulatorView: React.FC<SimulatorViewProps> = ({
   simulatorPerformance,
   onUpdatePerformance,
-  onSelectTermById
+  onResetPerformance,
+  onSelectTermById,
 }) => {
-  // Simulator State
   const [currentQuestion, setCurrentQuestion] = useState<SimulatorQuestion>(SIMULATOR_QUESTIONS[0]);
   const [userDraft, setUserDraft] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
+  const relatedTermByQuestionId: Record<string, string> = {
+    'class-vs-struct': 'class',
+    'what-is-interface': 'interface',
+    'async-await': 'async',
+    'what-is-linq': 'linq',
+    'ienumerable-iqueryable-list': 'iqueryable',
+    'exception-handling': 'exception',
+    'dependency-injection': 'injecao-dependencia',
+    'what-is-controller': 'controller',
+    'what-is-endpoint': 'endpoint',
+    'what-is-middleware': 'middleware',
+    'http-status-codes': 'response',
+    'api-authentication': 'jwt',
+    'what-is-jwt': 'jwt',
+    'what-is-dto': 'dto',
+    'why-not-return-entity': 'entidade',
+    'inner-vs-left-join': 'inner-join',
+    'what-is-index': 'indice',
+    'what-is-transaction': 'transacao',
+    'normalization-db': 'normalizacao',
+    'what-is-migration': 'migration',
+    'what-is-entity-framework': 'dbcontext',
+    'query-performance-issues': 'n-plus-1',
+  };
 
-  // Stats calculation
   const totalQuestions = SIMULATOR_QUESTIONS.length;
   const answeredKeys = Object.keys(simulatorPerformance);
   const answeredCount = answeredKeys.length;
-  
-  const acerteiCount = answeredKeys.filter((k) => simulatorPerformance[k] === 'acertei').length;
-  const maisOuMenosCount = answeredKeys.filter((k) => simulatorPerformance[k] === 'mais_ou_menos').length;
-  const erreiCount = answeredKeys.filter((k) => simulatorPerformance[k] === 'errei').length;
+  const acerteiCount = answeredKeys.filter((key) => simulatorPerformance[key] === 'acertei').length;
+  const maisOuMenosCount = answeredKeys.filter((key) => simulatorPerformance[key] === 'mais_ou_menos').length;
+  const erreiCount = answeredKeys.filter((key) => simulatorPerformance[key] === 'errei').length;
+  const scorePercent =
+    answeredCount > 0 ? Math.round(((acerteiCount + maisOuMenosCount * 0.5) / answeredCount) * 100) : 0;
 
-  const scorePercent = answeredCount > 0 ? Math.round(((acerteiCount + maisOuMenosCount * 0.5) / answeredCount) * 100) : 0;
-
-  // Set randomized initial question
   const handleShuffleQuestion = () => {
-    const unvisited = SIMULATOR_QUESTIONS.filter((q) => !simulatorPerformance[q.id]);
+    const unvisited = SIMULATOR_QUESTIONS.filter((question) => !simulatorPerformance[question.id]);
     const pool = unvisited.length > 0 ? unvisited : SIMULATOR_QUESTIONS;
-    
-    // Pick one that is different from current if possible
-    let nextQ = pool[Math.floor(Math.random() * pool.length)];
-    if (nextQ.id === currentQuestion.id && SIMULATOR_QUESTIONS.length > 1) {
-      const remainingQ = SIMULATOR_QUESTIONS.filter((q) => q.id !== currentQuestion.id);
-      nextQ = remainingQ[Math.floor(Math.random() * remainingQ.length)];
+    let nextQuestion = pool[Math.floor(Math.random() * pool.length)];
+
+    if (nextQuestion.id === currentQuestion.id && SIMULATOR_QUESTIONS.length > 1) {
+      const remainingQuestions = SIMULATOR_QUESTIONS.filter((question) => question.id !== currentQuestion.id);
+      nextQuestion = remainingQuestions[Math.floor(Math.random() * remainingQuestions.length)];
     }
-    
-    setCurrentQuestion(nextQ);
+
+    setCurrentQuestion(nextQuestion);
     setUserDraft('');
     setShowAnswer(false);
     setLastAction(null);
@@ -63,219 +83,237 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
 
   const handleRatePerformance = (rating: 'errei' | 'mais_ou_menos' | 'acertei') => {
     onUpdatePerformance(currentQuestion.id, rating);
-    setLastAction(`Avaliado como: ${rating === 'acertei' ? 'Acertei' : rating === 'mais_ou_menos' ? 'Mais ou menos' : 'Errei'}`);
-    
-    // Auto advance hint or toast
-    setTimeout(() => {
-      // Opt-in automatic progression or show success
-    }, 500);
+    setLastAction(
+      rating === 'acertei' ? 'Avaliado como Acertei' : rating === 'mais_ou_menos' ? 'Avaliado como Mais ou menos' : 'Avaliado como Errei',
+    );
   };
 
   const handleResetScores = () => {
-    if (confirm('Deseja mesmo resetar todo o seu histórico do Simulado de Entrevistas?')) {
-      // clear performance
-      SIMULATOR_QUESTIONS.forEach(q => {
-        onUpdatePerformance(q.id, undefined as any);
-      });
+    if (window.confirm('Deseja mesmo apagar o histórico do simulado?')) {
+      onResetPerformance();
       setUserDraft('');
       setShowAnswer(false);
+      setLastAction(null);
     }
   };
+
+  const performanceForCurrentQuestion = simulatorPerformance[currentQuestion.id];
+
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Board Statistics Banner */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 flex items-center gap-4">
-          <BookOpen className="w-8 h-8 text-sky-400 shrink-0" />
-          <div>
-            <span className="text-[10px] text-slate-500 font-mono block">RESPONDIDAS</span>
-            <span className="text-xl font-bold font-mono text-slate-100">{answeredCount}/{totalQuestions}</span>
+    <div className="space-y-5 animate-fadeIn">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="flex items-center gap-3">
+            <BookOpen className="h-8 w-8 shrink-0 text-teal-300" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Respondidas</p>
+              <p className="font-mono text-2xl font-semibold tabular-nums text-neutral-100">
+                {answeredCount}/{totalQuestions}
+              </p>
+            </div>
           </div>
-        </div>
+        </article>
 
-        <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 flex items-center gap-4">
-          <CheckCircle className="w-8 h-8 text-emerald-400 shrink-0" />
-          <div>
-            <span className="text-[10px] text-slate-500 font-mono block">CONFIRMADAS</span>
-            <span className="text-xl font-bold font-mono text-emerald-400">{acerteiCount}</span>
+        <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-8 w-8 shrink-0 text-emerald-300" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Acertei</p>
+              <p className="font-mono text-2xl font-semibold tabular-nums text-emerald-300">{acerteiCount}</p>
+            </div>
           </div>
-        </div>
+        </article>
 
-        <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 flex items-center gap-4">
-          <AlertTriangle className="w-8 h-8 text-orange-400 shrink-0" />
-          <div>
-            <span className="text-[10px] text-slate-500 font-mono block">RAZOÁVEL</span>
-            <span className="text-xl font-bold font-mono text-orange-400">{maisOuMenosCount}</span>
+        <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-8 w-8 shrink-0 text-amber-300" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Meio termo</p>
+              <p className="font-mono text-2xl font-semibold tabular-nums text-amber-300">{maisOuMenosCount}</p>
+            </div>
           </div>
-        </div>
+        </article>
 
-        <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 flex items-center gap-4">
-          <Trophy className="w-8 h-8 text-orange-400 shrink-0" />
-          <div>
-            <span className="text-[10px] text-slate-500 font-mono block">APROVEITAMENTO</span>
-            <span className="text-xl font-bold font-mono text-slate-100">{scorePercent}%</span>
+        <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="flex items-center gap-3">
+            <Trophy className="h-8 w-8 shrink-0 text-teal-300" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Aproveitamento</p>
+              <p className="font-mono text-2xl font-semibold tabular-nums text-neutral-100">{scorePercent}%</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
 
-      {/* Main card simulator arena */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl relative">
-        <div className="flex items-center justify-between gap-4 border-b border-slate-850 pb-4 flex-wrap">
-          <div>
-            <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded">SIMULADO TÉCNICO</span>
-            <span className="text-xs text-slate-450 block mt-1">Categoria: {currentQuestion.category}</span>
+      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+        <div className="flex flex-col gap-4 border-b border-white/[0.08] pb-4 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-2">
+            <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+              Simulado técnico
+            </span>
+            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Categoria: {currentQuestion.category}</p>
           </div>
-          
-          <div className="flex gap-2">
+
+          <div className="flex flex-wrap gap-2">
             <button
+              type="button"
               onClick={handleShuffleQuestion}
-              className="px-4 py-2 bg-slate-850 hover:bg-sky-500 hover:text-slate-950 text-slate-200 border border-slate-750 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
               id="btn-shuffle-question"
             >
-              <Shuffle className="w-4 h-4" /> Próxima Pergunta
+              <Shuffle className="h-4 w-4" />
+              Próxima pergunta
             </button>
-            
-            {answeredCount > 0 && (
+
+            {answeredCount > 0 ? (
               <button
+                type="button"
                 onClick={handleResetScores}
-                className="px-3 py-2 bg-transparent text-slate-500 hover:text-orange-450 rounded-xl text-xs font-mono tracking-tight transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/15 active:scale-[0.99]"
                 title="Reset histórico"
               >
-                Resetar Dados
+                Resetar dados
               </button>
-            )}
+            ) : null}
           </div>
         </div>
 
-        {/* The Question Text */}
-        <div className="bg-slate-950 p-6 rounded-xl border border-slate-855 space-y-2">
-          <h3 className="text-sky-400 font-bold text-[10px] uppercase font-mono tracking-widest flex items-center gap-2">
-            <HelpCircle className="w-4 h-4 text-sky-400" /> Pergunta do Entrevistador:
-          </h3>
-          <p className="text-slate-100 text-lg font-black leading-snug font-sans">
-            "{currentQuestion.question}"
+        <div className="mt-5 rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-5">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="h-4 w-4 text-teal-300" />
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Pergunta do entrevistador</h3>
+          </div>
+          <p className="mt-3 text-lg font-bold leading-snug text-neutral-100 md:text-xl">
+            {currentQuestion.question}
           </p>
         </div>
 
-        {/* Textbox writing training drafting */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-400 font-mono">Escreva ou esquematize mentalmente sua resposta:</label>
-            <span className="text-[10px] text-slate-500 font-mono">Simulador local</span>
+        <div className="mt-5 space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <label className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">
+              Escreva ou esquematize sua resposta
+            </label>
+            <span className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">Simulador local</span>
           </div>
+
           <textarea
             value={userDraft}
-            onChange={(e) => setUserDraft(e.target.value)}
+            onChange={(event) => setUserDraft(event.target.value)}
             disabled={showAnswer}
-            placeholder="Rascunhe aqui os termos chaves que você falaria na entrevista... (ex: Tipo de referência, Garbage collector...)"
-            rows={4}
-            className="w-full bg-slate-955 text-slate-100 border border-slate-850 hover:border-slate-750 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl outline-none p-4 text-sm transition-colors placeholder:text-slate-650 font-mono"
+            placeholder="Rascunhe aqui os termos que você diria na entrevista..."
+            rows={5}
+            className="w-full rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-4 text-sm text-neutral-100 outline-none transition focus:border-teal-400/70 focus:ring-4 focus:ring-teal-400/15 placeholder:text-neutral-500 disabled:opacity-70"
             id="draft-textarea"
           />
         </div>
 
-        {/* View answer reveal trigger */}
         {!showAnswer ? (
           <button
+            type="button"
             onClick={() => setShowAnswer(true)}
-            className="w-full bg-sky-500 hover:bg-sky-450 text-slate-950 p-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all shadow-lg"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-teal-400/25 bg-teal-400 px-4 py-4 text-sm font-bold text-neutral-950 transition hover:bg-teal-300 active:scale-[0.99]"
             id="btn-reveal-answer"
           >
-            <Eye className="w-4 h-4" /> Revelar Resposta Ideal e Critérios
+            <Eye className="h-4 w-4" />
+            Revelar resposta ideal
           </button>
         ) : (
-          <div className="space-y-6 pt-2 animate-fadeIn border-t border-slate-850">
-            
-            {/* Ideal short answers */}
-            <div className="bg-slate-950 p-5 rounded-xl border border-slate-850/80">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-sky-400 mb-1.5">Análise Curta (Direto ao ponto)</h4>
-              <p className="text-slate-200 text-sm italic">"{currentQuestion.idealShortAnswer}"</p>
+          <div className="mt-5 space-y-4 border-t border-white/[0.08] pt-5">
+            <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Resposta curta</p>
+              <p className="mt-2 text-sm leading-6 text-neutral-200 italic">"{currentQuestion.idealShortAnswer}"</p>
             </div>
 
-            {/* Ideal complete answers */}
-            <div className="bg-slate-950 p-5 rounded-xl border border-slate-850/80">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-orange-400 mb-1.5">Gabarito Completo (Resposta Plena)</h4>
-              <p className="text-slate-200 text-sm leading-relaxed">{currentQuestion.idealCompleteAnswer}</p>
+            <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300">Resposta completa</p>
+              <p className="mt-2 text-sm leading-6 text-neutral-300">{currentQuestion.idealCompleteAnswer}</p>
             </div>
 
-            {/* Checklists checkup */}
-            <div className="bg-slate-950 p-5 rounded-xl border border-slate-850/85 space-y-2">
-              <h4 className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-450">Pontos chave que esperam ouvir de você:</h4>
-              <ul className="space-y-1.5 text-xs text-slate-305">
+            <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Pontos que valem ouvir</p>
+              <ul className="mt-3 space-y-2 text-sm text-neutral-300">
                 {currentQuestion.expectedPoints.map((point, index) => (
-                  <li key={index} className="flex items-center gap-2 leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{point}</span>
+                  <li key={index} className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                    <span className="leading-6">{point}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Self evaluation controls rate */}
-            <div className="bg-slate-950 p-6 rounded-xl border border-slate-850 space-y-4">
-              <div className="text-center space-y-1">
-                <h4 className="text-xs font-bold text-slate-100 font-mono">Como foi seu desempenho nessa resposta?</h4>
-                <p className="text-[10px] text-slate-500 font-mono">Seja honesto para calibrar seu progresso de estudo no localStorage.</p>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="text-center">
+                <h4 className="text-sm font-semibold text-neutral-100">Como foi sua resposta?</h4>
+                <p className="mt-1 text-xs text-neutral-500">Seja honesto para calibrar seu histórico local.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
                 <button
+                  type="button"
                   onClick={() => handleRatePerformance('errei')}
-                  className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                    simulatorPerformance[currentQuestion.id] === 'errei'
-                      ? 'bg-orange-500/10 text-orange-400 border-orange-500/25 shadow-sm'
-                      : 'bg-transparent text-slate-450 border-slate-850 hover:text-orange-410 hover:border-orange-500/20'
+                  className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                    performanceForCurrentQuestion === 'errei'
+                      ? 'border-amber-400/25 bg-amber-400/10 text-amber-300'
+                      : 'border-white/[0.08] bg-transparent text-neutral-400 hover:border-amber-400/25 hover:text-amber-300'
                   }`}
                   id="rate-fail"
                 >
-                  <XCircle className="w-4 h-4" /> Errei a resposta
+                  <XCircle className="h-4 w-4" />
+                  Errei
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleRatePerformance('mais_ou_menos')}
-                  className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                    simulatorPerformance[currentQuestion.id] === 'mais_ou_menos'
-                      ? 'bg-orange-400/10 text-orange-400 border-orange-400/25'
-                      : 'bg-transparent text-slate-450 border-slate-850 hover:text-orange-410 hover:border-orange-400/25'
+                  className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                    performanceForCurrentQuestion === 'mais_ou_menos'
+                      ? 'border-amber-400/25 bg-amber-400/10 text-amber-300'
+                      : 'border-white/[0.08] bg-transparent text-neutral-400 hover:border-amber-400/25 hover:text-amber-300'
                   }`}
-                  id="rate-[#F59E0B]"
+                  id="rate-partial"
                 >
-                  <AlertTriangle className="w-4 h-4" /> Lembrei Mais ou Menos
+                  <AlertTriangle className="h-4 w-4" />
+                  Mais ou menos
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleRatePerformance('acertei')}
-                  className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                    simulatorPerformance[currentQuestion.id] === 'acertei'
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
-                      : 'bg-transparent text-slate-450 border-slate-850 hover:text-[#22C55E] hover:border-emerald-500/20'
+                  className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                    performanceForCurrentQuestion === 'acertei'
+                      ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
+                      : 'border-white/[0.08] bg-transparent text-neutral-400 hover:border-emerald-400/25 hover:text-emerald-300'
                   }`}
                   id="rate-success"
                 >
-                  <CheckCircle className="w-4 h-4" /> Dominei e acertei!
+                  <CheckCircle className="h-4 w-4" />
+                  Acertei
                 </button>
               </div>
 
-              {/* Feedback and next prompt warning */}
-              {lastAction && (
-                <div className="mt-3 text-center">
-                  <p className="text-xs text-sky-400 font-semibold flex items-center justify-center gap-1">
-                    🎉 {lastAction}! Clique em "Próxima Pergunta" acima para testar outra.
-                  </p>
-                </div>
-              )}
+              {lastAction ? (
+                <p className="mt-4 text-center text-sm font-medium text-teal-300">{lastAction}</p>
+              ) : null}
             </div>
-
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Recommended study bypass suggestion */}
-      <div className="p-4 bg-slate-950/40 rounded-xl border border-slate-850">
-        <p className="text-xs text-slate-500 text-center">
-          <strong>Quer estudar a teoria deste assunto?</strong> Você pode pesquisar o nome correspondente no campo de busca ou no painel de categorias para abrir o card de revisão contendo o mini quiz interativo!
+      <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <p className="text-center text-sm leading-6 text-neutral-500">
+          Quer abrir a teoria deste assunto? Use a busca ou o roadmap e escolha o card do termo para continuar.
         </p>
-      </div>
+        {relatedTermByQuestionId[currentQuestion.id] ? (
+          <button
+            type="button"
+            onClick={() => onSelectTermById(relatedTermByQuestionId[currentQuestion.id])}
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
+          >
+            Abrir termo relacionado
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        ) : null}
+      </section>
     </div>
   );
 };

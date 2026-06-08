@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  LayoutDashboard,
-  Map,
-  MessageSquareCode,
-  AlertCircle,
-  HelpCircle,
-  Trophy,
-  Star
-} from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Map, MessageSquareCode, Trophy } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: 'dashboard' | 'roadmap' | 'simulator' | 'review';
@@ -18,116 +10,131 @@ interface SidebarProps {
   difficultCount: number;
 }
 
+type MenuItem = {
+  id: SidebarProps['activeTab'];
+  label: string;
+  desc: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+};
+
+const menuItems: MenuItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    desc: 'Visão geral da sessão',
+    icon: LayoutDashboard,
+  },
+  {
+    id: 'roadmap',
+    label: 'Mapa de estudos',
+    desc: 'Etapas e blocos de conteúdo',
+    icon: Map,
+  },
+  {
+    id: 'simulator',
+    label: 'Simulado',
+    desc: 'Respostas e autoavaliação',
+    icon: MessageSquareCode,
+  },
+  {
+    id: 'review',
+    label: 'Revisões',
+    desc: 'Pendências e pontos fracos',
+    icon: AlertCircle,
+  },
+];
+
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   learnedCount,
   totalCount,
   reviewCount,
-  difficultCount
+  difficultCount,
 }) => {
-  interface MenuItem {
-    readonly id: 'dashboard' | 'roadmap' | 'simulator' | 'review';
-    readonly label: string;
-    readonly icon: React.ComponentType<any>;
-    readonly desc: string;
-    readonly badge?: number;
-  }
-
-  const menuItems: readonly MenuItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      desc: 'Área geral e progresso'
-    },
-    {
-      id: 'roadmap',
-      label: 'Mapa de Estudos',
-      icon: Map,
-      desc: 'Trilha guiada C#/.NET'
-    },
-    {
-      id: 'simulator',
-      label: 'Simulado de Entrevista',
-      icon: MessageSquareCode,
-      desc: 'Treine perguntas reais'
-    },
-    {
-      id: 'review',
-      label: 'Revisões & Difíceis',
-      icon: AlertCircle,
-      desc: 'Foco no que gera dúvida',
-      badge: reviewCount + difficultCount
-    }
-  ];
-
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 text-slate-200">
-      {/* Sidebar Branding Header */}
-      <div className="p-6 border-b border-slate-800">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-sky-400 font-black text-xl font-mono">.NET</span>
-          <span className="text-slate-400 text-xs font-mono">ROADMAP v1.0</span>
-        </div>
-        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
+    <aside className="hidden w-72 shrink-0 border-r border-white/[0.08] bg-white/[0.02] md:flex md:flex-col">
+      <div className="space-y-4 border-b border-white/[0.08] p-5">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] text-slate-500 font-mono uppercase">Seu Ritmo</p>
-            <p className="text-xs font-bold text-slate-300">
-              {learnedCount === totalCount ? 'Mestre .NET 🎉' : 'Iniciado'}
-            </p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Painel</p>
+            <p className="mt-1 text-xl font-extrabold tracking-tight text-neutral-100">.NET Roadmap</p>
           </div>
-          <Trophy className={`w-5 h-5 ${learnedCount > 0 ? 'text-orange-400' : 'text-slate-600'}`} />
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-400/10 text-teal-300">
+            <Trophy className="h-5 w-5" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Estudados</p>
+            <p className="mt-2 font-mono text-lg tabular-nums text-neutral-100">{learnedCount}</p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Pendentes</p>
+            <p className="mt-2 font-mono text-lg tabular-nums text-neutral-100">{totalCount - learnedCount}</p>
+          </div>
         </div>
       </div>
 
-      {/* Menu Options */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 space-y-2 p-3">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const badge = item.id === 'review' ? reviewCount + difficultCount : item.badge;
+
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-150 text-left cursor-pointer group ${
+              className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition duration-200 ${
                 isActive
-                  ? 'bg-slate-800 text-sky-400 border-l-4 border-sky-500'
-                  : 'text-slate-400 hover:bg-slate-850 hover:text-slate-100 border-l-4 border-transparent'
+                  ? 'border-teal-400/25 bg-teal-400/10 text-teal-200'
+                  : 'border-transparent text-neutral-400 hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-neutral-100'
               }`}
               id={`sidebar-tab-${item.id}`}
             >
-              <div className="flex items-center gap-3">
-                <Icon
-                  className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-sky-400' : 'text-slate-500 group-hover:text-slate-200'
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                    isActive ? 'border-teal-400/25 bg-teal-400/10 text-teal-300' : 'border-white/[0.08] bg-white/[0.03] text-neutral-500'
                   }`}
-                />
-                <div>
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+
+                <div className="min-w-0">
                   <p className="text-sm font-semibold leading-tight">{item.label}</p>
-                  <p className="text-[10px] text-slate-500 leading-tight block">{item.desc}</p>
+                  <p className="mt-1 text-xs leading-tight text-neutral-500">{item.desc}</p>
                 </div>
               </div>
-              {item.badge !== undefined && item.badge > 0 && (
-                <span className="text-px bg-orange-500 text-slate-950 text-[10px] px-2 py-0.5 rounded-full font-bold font-mono">
-                  {item.badge}
+
+              {typeof badge === 'number' && badge > 0 ? (
+                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-amber-300">
+                  {badge}
                 </span>
-              )}
+              ) : null}
             </button>
           );
         })}
       </nav>
 
-      {/* Pro Tip Box inside the footer */}
-      <div className="p-4 border-t border-slate-800 bg-slate-950/20">
-        <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800/60">
-          <div className="flex items-center gap-2 mb-1">
-            <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
-            <h4 className="text-xs font-bold text-slate-200">Dica de Sucesso</h4>
-          </div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            Intercalando estudos técnicos com o <strong>Simulado de Entrevista</strong>, você valida sua memorização corporal e de termos prontificados!
+      <div className="border-t border-white/[0.08] p-4">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Hoje</p>
+          <p className="mt-2 text-sm leading-6 text-neutral-300">
+            Abra um termo, avalie sua confiança e siga para a próxima etapa sem quebrar o ritmo.
           </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold text-teal-300">
+              Revisões {reviewCount}
+            </span>
+            <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold text-amber-300">
+              Difíceis {difficultCount}
+            </span>
+          </div>
         </div>
       </div>
     </aside>

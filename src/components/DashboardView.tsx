@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { StudyTerm, StudyStatus } from '../types';
-import { STUDY_CATEGORIES } from '../data/categories';
 import {
-  CheckCircle,
+  ArrowRight,
+  BookOpen,
+  ChevronRight,
   Clock,
+  Lightbulb,
   Play,
   RotateCcw,
-  Sparkles,
   Search,
-  BookOpen,
-  ArrowRight,
-  ChevronRight,
-  Star,
-  Award,
-  Lightbulb
 } from 'lucide-react';
+import { STUDY_CATEGORIES } from '../data/categories';
+import { StudyStatus, StudyTerm } from '../types';
 
 interface DashboardViewProps {
   terms: StudyTerm[];
@@ -25,306 +21,343 @@ interface DashboardViewProps {
   onReviewHardTerms: () => void;
 }
 
+const getStatusStyles = (status: StudyStatus) => {
+  switch (status) {
+    case 'aprendido':
+      return 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300';
+    case 'revisar':
+      return 'border-amber-400/25 bg-amber-400/10 text-amber-300';
+    case 'estudando':
+      return 'border-teal-400/25 bg-teal-400/10 text-teal-300';
+    default:
+      return 'border-white/[0.08] bg-white/[0.03] text-neutral-400';
+  }
+};
+
 export const DashboardView: React.FC<DashboardViewProps> = ({
   terms,
   termStatus,
   termConfidence,
   searchQuery,
   onSelectTerm,
-  onReviewHardTerms
+  onReviewHardTerms,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Filter terms by global search query
-  const filteredTerms = terms.filter((t) => {
+  const filteredTerms = terms.filter((term) => {
     if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase();
+
     return (
-      t.name.toLowerCase().includes(q) ||
-      t.category.toLowerCase().includes(q) ||
-      t.tags.some((tag) => tag.toLowerCase().includes(q)) ||
-      t.simpleExplanation.toLowerCase().includes(q)
+      term.name.toLowerCase().includes(query) ||
+      term.category.toLowerCase().includes(query) ||
+      term.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+      term.simpleExplanation.toLowerCase().includes(query)
     );
   });
 
-  // Calculations for stats
   const totalCount = terms.length;
-  const learnedList = terms.filter((t) => termStatus[t.id] === 'aprendido');
-  const learnedCount = learnedList.length;
-  const reviewingCount = terms.filter((t) => termStatus[t.id] === 'revisar').length;
-  const studyingCount = terms.filter((t) => termStatus[t.id] === 'estudando').length;
+  const learnedCount = terms.filter((term) => termStatus[term.id] === 'aprendido').length;
+  const reviewingCount = terms.filter((term) => termStatus[term.id] === 'revisar').length;
   const progressPercent = totalCount > 0 ? Math.round((learnedCount / totalCount) * 100) : 0;
 
-  // Next recommended term: first term in the roadmap that is "não estudado" or "estudando"
-  const recommendedTerm = terms.find(
-    (t) => !termStatus[t.id] || termStatus[t.id] === 'não estudado' || termStatus[t.id] === 'estudando'
-  ) || terms[0];
-
-  // Count terms per category
-  const getCategoryStats = (category: string) => {
-    const catTerms = terms.filter((t) => t.category === category);
-    const catTotal = catTerms.length;
-    const catLearned = catTerms.filter((t) => termStatus[t.id] === 'aprendido').length;
-    const catPercent = catTotal > 0 ? Math.round((catLearned / catTotal) * 100) : 0;
-    return { total: catTotal, learned: catLearned, percent: catPercent };
-  };
+  const recommendedTerm =
+    terms.find((term) => !termStatus[term.id] || termStatus[term.id] === 'não estudado' || termStatus[term.id] === 'estudando') ||
+    terms[0];
 
   const currentCategoryTerms = selectedCategory
-    ? filteredTerms.filter((t) => t.category === selectedCategory)
+    ? filteredTerms.filter((term) => term.category === selectedCategory)
     : filteredTerms;
 
+  const getCategoryStats = (category: string) => {
+    const categoryTerms = terms.filter((term) => term.category === category);
+    const learnedInCategory = categoryTerms.filter((term) => termStatus[term.id] === 'aprendido').length;
+    const percent = categoryTerms.length > 0 ? Math.round((learnedInCategory / categoryTerms.length) * 100) : 0;
+
+    return {
+      total: categoryTerms.length,
+      learned: learnedInCategory,
+      percent,
+    };
+  };
+
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Bento Stats Banner */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Main progress card */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl">
-          <div className="space-y-4 flex-1">
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md">STATUS DA JORNADA</span>
-              <h2 className="text-2xl font-black text-slate-50">Preparatório .NET C#</h2>
-              <p className="text-xs text-slate-400">Transformando teoria em aprovação técnica para vagas Júnior e Pleno.</p>
+    <div className="space-y-5 animate-fadeIn">
+      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+        <article className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+                Sessão atual
+              </span>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">Estudo de backend sem ruído</h2>
+                <p className="max-w-xl text-sm leading-6 text-neutral-400">
+                  Abra um termo, marque o estado e siga adiante. O painel fica curto de propósito.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => onSelectTerm(recommendedTerm)}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-teal-400/25 bg-teal-400 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-teal-300 active:scale-[0.99]"
+                  id="btn-recommended-term"
+                >
+                  <Play className="h-4 w-4 fill-current" />
+                  Continuar estudo
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onReviewHardTerms}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
+                  id="btn-review-hard-terms"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Ver difíceis
+                </button>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-3 gap-3 pt-2">
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center">
-                <span className="text-xs text-slate-500 font-mono block">Progresso</span>
-                <span className="text-xl font-bold font-mono text-slate-100">{progressPercent}%</span>
+
+            <div className="grid min-w-[15rem] grid-cols-3 gap-2">
+              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Progresso</p>
+                <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-neutral-100">{progressPercent}%</p>
               </div>
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center">
-                <span className="text-xs text-emerald-400 font-mono block">Aprendidos</span>
-                <span className="text-xl font-bold font-mono text-emerald-400">{learnedCount}</span>
+
+              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-emerald-300">Aprendidos</p>
+                <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-emerald-300">{learnedCount}</p>
               </div>
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-center">
-                <span className="text-xs text-orange-400 font-mono block">A Revisar</span>
-                <span className="text-xl font-bold font-mono text-orange-400">{reviewingCount}</span>
+
+              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-amber-300">Em revisão</p>
+                <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-amber-300">{reviewingCount}</p>
               </div>
             </div>
           </div>
+        </article>
 
-          <div className="relative shrink-0 flex items-center justify-center">
-            {/* Radial progress metric circle */}
-            <svg className="w-28 h-28 transform -rotate-90">
-              <circle
-                cx="56"
-                cy="56"
-                r="46"
-                className="stroke-slate-800 fill-none"
-                strokeWidth="8"
-              />
-              <circle
-                cx="56"
-                cy="56"
-                r="46"
-                className="stroke-sky-500 fill-none transition-all duration-500"
-                strokeWidth="8"
-                strokeDasharray={2 * Math.PI * 46}
-                strokeDashoffset={2 * Math.PI * 46 * (1 - progressPercent / 100)}
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="absolute text-lg font-black text-slate-100 font-mono">{progressPercent}%</span>
-          </div>
-        </div>
-
-        {/* Next recommended element study shortcut */}
-        {recommendedTerm && (
-          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col justify-between gap-4 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-3 bg-sky-500/5 rounded-bl-xl border-l border-b border-slate-800">
-              <Lightbulb className="w-5 h-5 text-orange-400" />
-            </div>
-
+        <aside className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+          <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-[10px] text-sky-450 font-mono font-semibold tracking-wider uppercase">Vá de encontro ao próximo assunto:</p>
-              <h3 className="text-lg font-black text-slate-100 font-mono leading-tight group-hover:text-sky-400 transition-colors">{recommendedTerm.name}</h3>
-              <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{recommendedTerm.simpleExplanation}</p>
-              <div className="flex gap-2 pt-1">
-                <span className="text-[9px] bg-slate-850 text-slate-300 font-mono px-2 py-0.5 rounded uppercase border border-slate-800">Liv. {recommendedTerm.level}</span>
-                <span className="text-[9px] bg-sky-500/10 text-sky-400 font-mono px-2 py-0.5 rounded border border-sky-500/15">{recommendedTerm.category}</span>
-              </div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Próximo termo</p>
+              <h3 className="text-lg font-extrabold tracking-tight text-neutral-100">{recommendedTerm.name}</h3>
+              <p className="line-clamp-3 text-sm leading-6 text-neutral-400">{recommendedTerm.simpleExplanation}</p>
             </div>
-
-            <button
-              onClick={() => onSelectTerm(recommendedTerm)}
-              className="w-full bg-slate-800 text-slate-100 hover:bg-sky-500 hover:text-slate-950 p-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors mt-2 border border-slate-700/55"
-              id="btn-recommended-term"
-            >
-              <Play className="w-4 h-4 fill-current" /> Continuar Estudando
-            </button>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-400/10 text-teal-300">
+              <Lightbulb className="h-5 w-5" />
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Grid Quick Shortcuts and searching */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between border-t border-slate-800 pt-6">
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-sky-400" /> Categorias Teóricas de Estudos
-          </h3>
-          <p className="text-xs text-slate-400">Navegue pelas pastas de conteúdo para preparar seu repertório de respostas.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-300">
+              {recommendedTerm.category}
+            </span>
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-300">
+              Nível {recommendedTerm.level}
+            </span>
+            {termConfidence[recommendedTerm.id] ? (
+              <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-300">
+                Confiança {termConfidence[recommendedTerm.id]}/5
+              </span>
+            ) : null}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onSelectTerm(recommendedTerm)}
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
+          >
+            Abrir termo
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </aside>
+      </section>
+
+      <section className="flex flex-col gap-3 border-t border-white/[0.08] pt-5 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-teal-300" />
+            <h3 className="text-lg font-bold tracking-tight text-neutral-100">Categorias de estudo</h3>
+          </div>
+          <p className="max-w-2xl text-sm leading-6 text-neutral-400">
+            Clique em um bloco para ver os termos dele. Se houver pesquisa ativa, a lista fica ainda mais direta.
+          </p>
         </div>
 
         <button
+          type="button"
           onClick={onReviewHardTerms}
-          className="bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-slate-950 border border-orange-500/20 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/15 active:scale-[0.99]"
           id="btn-review-hard-terms"
         >
-          <RotateCcw className="w-4 h-4" /> Revisar Termos Difíceis (Confiança 1 ou 2)
+          <Clock className="h-4 w-4" />
+          Revisar termos difíceis
         </button>
-      </div>
+      </section>
 
-      {/* Categories Grid or searching results list filter */}
       {searchQuery ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h4 className="text-xs tracking-widest font-mono text-slate-500 uppercase">Resultado da Pesquisa ({filteredTerms.length} termos encontrados):</h4>
-          
+        <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+              Resultado da pesquisa ({filteredTerms.length})
+            </p>
+            <Search className="h-4 w-4 text-neutral-500" />
+          </div>
+
           {filteredTerms.length === 0 ? (
-            <div className="text-center py-10 space-y-2">
-              <Search className="w-10 h-10 text-slate-750 mx-auto" />
-              <p className="text-sm text-slate-400 font-bold">Nenhum termo técnico bateu com sua busca.</p>
-              <p className="text-xs text-slate-500">Tente buscar por termos mais genéricos como "class", "async" ou "JOIN".</p>
+            <div className="py-12 text-center">
+              <Search className="mx-auto h-10 w-10 text-neutral-600" />
+              <p className="mt-4 text-sm font-semibold text-neutral-200">Nenhum termo bateu com a busca.</p>
+              <p className="mt-2 text-sm text-neutral-500">Tente algo como class, async ou join.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filteredTerms.map((term) => {
                 const status = termStatus[term.id] || 'não estudado';
+
                 return (
-                  <div
+                  <button
                     key={term.id}
+                    type="button"
                     onClick={() => onSelectTerm(term)}
-                    className="p-4 bg-slate-950 border border-slate-850 rounded-xl hover:border-sky-500/40 hover:bg-slate-900/30 transition-all duration-150 cursor-pointer space-y-2"
+                    className="group flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-bold text-slate-100 font-mono">{term.name}</span>
-                      <span className={`text-[9px] font-mono border px-1.5 py-0.2 rounded-full ${
-                        status === 'aprendido' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25' :
-                        status === 'revisar' ? 'bg-orange-500/10 text-orange-400 border-orange-500/25' :
-                        status === 'estudando' ? 'bg-sky-500/10 text-sky-400 border-sky-500/25' :
-                        'bg-slate-800 text-slate-400 border-slate-700/65'
-                      }`}>
-                        {status}
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
+                        </div>
+                        <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                          {status}
+                        </span>
+                      </div>
+                      <p className="line-clamp-3 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between text-xs text-neutral-500">
+                      <span className="font-mono uppercase">Nível {term.level}</span>
+                      <span className="inline-flex items-center gap-1 text-teal-300">
+                        Abrir
+                        <ChevronRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{term.simpleExplanation}</p>
-                    <div className="flex items-center justify-between text-[10px] text-slate-500">
-                      <span>{term.category}</span>
-                      <span className="text-sky-450 flex items-center gap-1">Estudar <ChevronRight className="w-3 h-3" /></span>
-                    </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           )}
-        </div>
+        </section>
       ) : (
-        <div className="space-y-6">
-          {/* Main Category Grid with progress ratio displays */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {STUDY_CATEGORIES.map((category, idx) => {
-              const catStats = getCategoryStats(category);
+        <div className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {STUDY_CATEGORIES.map((category) => {
+              const stats = getCategoryStats(category);
               const isSelected = selectedCategory === category;
-              
+
               return (
-                <div
-                  key={idx}
+                <button
+                  key={category}
+                  type="button"
                   onClick={() => setSelectedCategory(isSelected ? null : category)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer select-none ${
+                  className={`rounded-2xl border p-4 text-left transition duration-200 ${
                     isSelected
-                      ? 'bg-slate-800 border-sky-500 shadow-lg'
-                      : 'bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-800/40'
+                      ? 'border-teal-400/25 bg-teal-400/10'
+                      : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.05]'
                   }`}
-                  id={`category-card-${idx}`}
                 >
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <h4 className="text-xs font-black font-sans text-slate-100 tracking-tight leading-tight">{category}</h4>
-                    <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap shrink-0">{catStats.learned}/{catStats.total}</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-neutral-100">{category}</p>
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">
+                        {stats.learned}/{stats.total} termos
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
+                      {stats.percent}%
+                    </span>
                   </div>
 
-                  {/* Visual Category Progress strip */}
-                  <div className="w-full bg-slate-950 border border-slate-850 h-1.5 rounded-full overflow-hidden mb-2">
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-900">
                     <div
-                      className={`h-full transition-all duration-300 ${
-                        catStats.percent === 100
-                          ? 'bg-emerald-500'
-                          : catStats.percent > 0
-                          ? 'bg-sky-500'
-                          : 'bg-transparent'
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        stats.percent === 100 ? 'bg-emerald-400' : stats.percent > 0 ? 'bg-teal-400' : 'bg-transparent'
                       }`}
-                      style={{ width: `${catStats.percent}%` }}
+                      style={{ width: `${stats.percent}%` }}
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-[9px]">
-                    <span className="text-slate-500">Progresso: {catStats.percent}%</span>
-                    <span className="text-sky-400 font-bold">
-                      {isSelected ? 'Ocultar termos ▲' : 'Ver termos ▼'}
+                  <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
+                    <span>Progresso</span>
+                    <span className="inline-flex items-center gap-1 text-teal-300">
+                      {isSelected ? 'Ocultar' : 'Ver termos'}
+                      <ChevronRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
 
-          {/* Expanded category items drawer list */}
-          {selectedCategory && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-4 animate-fadeIn">
-              <div className="flex items-center justify-between border-b border-slate-850 pb-3 flex-wrap gap-2">
-                <div>
-                  <span className="text-[10px] text-sky-450 font-mono uppercase tracking-widest font-black">Filtro Ativado</span>
-                  <h3 className="text-base font-black text-slate-100">{selectedCategory}</h3>
+          {selectedCategory ? (
+            <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+              <div className="flex flex-col gap-3 border-b border-white/[0.08] pb-4 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Filtro ativo</p>
+                  <h4 className="text-base font-bold text-neutral-100">{selectedCategory}</h4>
                 </div>
+
                 <button
+                  type="button"
                   onClick={() => setSelectedCategory(null)}
-                  className="text-xs text-slate-400 hover:text-slate-150 border border-slate-800 hover:border-slate-700 px-3 py-1 rounded-lg"
+                  className="inline-flex items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-semibold text-neutral-300 transition hover:bg-white/[0.06]"
                 >
-                  Fechar Filtro
+                  Limpar filtro
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {terms
-                  .filter((t) => t.category === selectedCategory)
-                  .map((term) => {
-                    const status = termStatus[term.id] || 'não estudado';
-                    const confidenceVal = termConfidence[term.id] || 0;
-                    
-                    return (
-                      <div
-                        key={term.id}
-                        onClick={() => onSelectTerm(term)}
-                        className="bg-slate-950 hover:bg-slate-900/60 p-4 border border-slate-800 hover:border-sky-500/40 rounded-xl cursor-pointer transition-all space-y-2 relative overflow-hidden flex flex-col justify-between"
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-sm font-bold text-slate-100 font-mono leading-tight">{term.name}</span>
-                            <span className={`text-[8px] font-bold font-mono border px-1.5 py-0.2 rounded uppercase ${
-                              status === 'aprendido' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25' :
-                              status === 'revisar' ? 'bg-orange-500/10 text-orange-400 border-orange-500/25' :
-                              status === 'estudando' ? 'bg-sky-500/10 text-sky-400 border-sky-500/25' :
-                              'bg-slate-800 text-slate-400 border-slate-700/65'
-                            }`}>
-                              {status}
-                            </span>
+              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {currentCategoryTerms.map((term) => {
+                  const status = termStatus[term.id] || 'não estudado';
+                  const confidence = termConfidence[term.id] || 0;
+
+                  return (
+                    <button
+                      key={term.id}
+                      type="button"
+                      onClick={() => onSelectTerm(term)}
+                      className="flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <h5 className="text-sm font-bold text-neutral-100">{term.name}</h5>
+                            <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
                           </div>
-                          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{term.simpleExplanation}</p>
+                          <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                            {status}
+                          </span>
                         </div>
 
-                        <div className="flex items-center justify-between border-t border-slate-850/50 pt-2 mt-2 text-[10px] text-slate-500">
-                          <span className="font-mono text-slate-500 uppercase text-[9px]">Lvl. {term.level}</span>
-                          <div className="flex items-center gap-1.5 text-sky-400">
-                            {confidenceVal > 0 && (
-                              <span className="text-orange-400 font-bold font-mono">★ {confidenceVal}/5</span>
-                            )}
-                            <span className="font-bold flex items-center gap-0.5">Estudar <ChevronRight className="w-3.5 h-3.5" /></span>
-                          </div>
-                        </div>
+                        <p className="line-clamp-2 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
                       </div>
-                    );
-                  })}
+
+                      <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-neutral-500">
+                        <span className="font-mono uppercase">Nível {term.level}</span>
+                        <span className="inline-flex items-center gap-1 text-teal-300">
+                          {confidence > 0 ? `Confiança ${confidence}/5` : 'Abrir'}
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-          )}
+            </section>
+          ) : null}
         </div>
       )}
     </div>

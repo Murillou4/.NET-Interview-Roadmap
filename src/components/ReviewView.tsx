@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import { StudyTerm, StudyStatus } from '../types';
-import {
-  Clock,
-  Star,
-  BookOpen,
-  ChevronRight,
-  Flame,
-  Award,
-  AlertTriangle,
-  FileText
-} from 'lucide-react';
+import { AlertTriangle, Award, ChevronRight, Clock, Flame } from 'lucide-react';
+import { StudyStatus, StudyTerm } from '../types';
 
 interface ReviewViewProps {
   terms: StudyTerm[];
@@ -18,147 +9,146 @@ interface ReviewViewProps {
   onSelectTerm: (term: StudyTerm) => void;
 }
 
+const getStatusStyles = (status: StudyStatus) => {
+  switch (status) {
+    case 'aprendido':
+      return 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300';
+    case 'revisar':
+      return 'border-amber-400/25 bg-amber-400/10 text-amber-300';
+    case 'estudando':
+      return 'border-teal-400/25 bg-teal-400/10 text-teal-300';
+    default:
+      return 'border-white/[0.08] bg-white/[0.03] text-neutral-400';
+  }
+};
+
 export const ReviewView: React.FC<ReviewViewProps> = ({
   terms,
   termStatus,
   termConfidence,
-  onSelectTerm
+  onSelectTerm,
 }) => {
   const [subTab, setSubTab] = useState<'revisar' | 'dificeis'>('revisar');
 
-  // 1. Marked to revise
-  const reviseTerms = terms.filter((t) => termStatus[t.id] === 'revisar');
+  const reviewTerms = terms.filter((term) => termStatus[term.id] === 'revisar');
+  const difficultTerms = terms.filter((term) => termConfidence[term.id] === 1 || termConfidence[term.id] === 2);
 
-  // 2. Hard terms (Confidence 1 or 2)
-  const difficultTerms = terms.filter(
-    (t) => termConfidence[t.id] === 1 || termConfidence[t.id] === 2
-  );
+  const activeTerms = subTab === 'revisar' ? reviewTerms : difficultTerms;
+  const title =
+    subTab === 'revisar' ? 'Caderno de revisões ativas' : 'Zona de treino intenso';
+  const description =
+    subTab === 'revisar'
+      ? 'Termos marcados manualmente como revisão. Abra um card e volte a estudar sem procurar demais.'
+      : 'Termos com confiança 1 ou 2. São os pontos que mais valem uma passada extra.';
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      {/* Sub tabs header */}
-      <div className="flex bg-slate-900 border border-slate-800 p-1.5 rounded-xl gap-2 max-w-md">
+    <div className="space-y-5 animate-fadeIn">
+      <div className="inline-flex rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1">
         <button
+          type="button"
           onClick={() => setSubTab('revisar')}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 ${
-            subTab === 'revisar'
-              ? 'bg-sky-500 text-slate-950'
-              : 'text-slate-450 hover:text-slate-100 hover:bg-slate-800'
+          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+            subTab === 'revisar' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
           }`}
         >
-          <Clock className="w-4 h-4" /> Marcados para Revisar ({reviseTerms.length})
+          <Clock className="h-4 w-4" />
+          Revisar ({reviewTerms.length})
         </button>
 
         <button
+          type="button"
           onClick={() => setSubTab('dificeis')}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 ${
-            subTab === 'dificeis'
-              ? 'bg-sky-500 text-slate-950'
-              : 'text-slate-450 hover:text-slate-100 hover:bg-slate-800'
+          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+            subTab === 'dificeis' ? 'bg-teal-400 text-neutral-950' : 'text-neutral-400 hover:text-neutral-100'
           }`}
         >
-          <AlertTriangle className="w-4 h-4" /> Termos Difíceis ({difficultTerms.length})
+          <AlertTriangle className="h-4 w-4" />
+          Difíceis ({difficultTerms.length})
         </button>
       </div>
 
-      {subTab === 'revisar' ? (
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <Clock className="text-orange-450 w-5 h-5 text-orange-400" /> Caderno de Revisões Ativas
-            </h3>
-            <p className="text-xs text-slate-400">
-              Estes são os termos técnicos que você marcou manualmente utilizando o botão "Marcar para revisar" nos cartões de estudos.
-            </p>
+      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              {subTab === 'revisar' ? (
+                <Clock className="h-5 w-5 text-teal-300" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-amber-300" />
+              )}
+              <h3 className="text-lg font-bold tracking-tight text-neutral-100">{title}</h3>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-neutral-400">{description}</p>
           </div>
 
-          {reviseTerms.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-3">
-              <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
-                <Award className="w-6 h-6" />
-              </div>
-              <h4 className="text-sm font-bold text-slate-100">Nenhum termo pendente de revisão!</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Ótimo trabalho! Você não tem nenhum assunto marcado para revisar. À medida que for estudando as categorias, marque termos que tiver dúvida para reuni-los aqui.
-              </p>
+          <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 px-4 py-3">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Itens na fila</p>
+            <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-neutral-100">{activeTerms.length}</p>
+          </div>
+        </div>
+
+        {activeTerms.length === 0 ? (
+          <div className="mt-6 rounded-3xl border border-white/[0.08] bg-neutral-950/60 p-8 text-center">
+            <div
+              className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full border ${
+                subTab === 'revisar'
+                  ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300'
+                  : 'border-teal-400/20 bg-teal-400/10 text-teal-300'
+              }`}
+            >
+              {subTab === 'revisar' ? <Award className="h-6 w-6" /> : <Flame className="h-6 w-6" />}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {reviseTerms.map((term) => (
-                <div
+            <h4 className="mt-4 text-sm font-semibold text-neutral-100">
+              {subTab === 'revisar' ? 'Nenhum termo pendente de revisão.' : 'Nenhum termo com confiança baixa.'}
+            </h4>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-neutral-500">
+              {subTab === 'revisar'
+                ? 'Quando quiser separar um assunto para voltar depois, use o botão de revisão dentro do card do termo.'
+                : 'Se algo travar, marque a confiança em 1 ou 2 quando estiver no card do termo e ele volta para esta fila.'}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {activeTerms.map((term) => {
+              const status = termStatus[term.id] || 'não estudado';
+              const confidence = termConfidence[term.id] || 0;
+
+              return (
+                <button
                   key={term.id}
+                  type="button"
                   onClick={() => onSelectTerm(term)}
-                  className="p-4 bg-slate-900 hover:bg-slate-950 border border-slate-800 hover:border-orange-500/35 rounded-xl cursor-pointer transition-all space-y-2 relative flex flex-col justify-between"
-                  id={`revise-term-card-${term.id}`}
+                  className="flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
+                  id={`${subTab}-term-card-${term.id}`}
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between gap-1">
-                      <h4 className="text-sm font-bold text-slate-100 font-mono leading-tight">{term.name}</h4>
-                      <span className="text-[8px] font-mono text-orange-400 border border-orange-500/20 px-1.5 py-0.2 rounded uppercase">Revisar</span>
-                    </div>
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{term.simpleExplanation}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-slate-850/50 pt-2 text-[10px] text-slate-500">
-                    <span>{term.category}</span>
-                    <span className="text-sky-400 font-bold flex items-center gap-0.5">Estudar <ChevronRight className="w-3.5 h-3.5" /></span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <AlertTriangle className="text-orange-400 w-5 h-5" /> Zona de Treino Intenso (Confiança 1 ou 2)
-            </h3>
-            <p className="text-xs text-slate-400">
-              Estes são os termos técnicos nos quais você avaliou seu nível de confiança entre 1 ("Disperso/Não sei falar") ou 2 ("Lembro apenas do nome").
-            </p>
-          </div>
-
-          {difficultTerms.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-3">
-              <div className="w-12 h-12 bg-sky-500/10 text-sky-400 rounded-full flex items-center justify-center mx-auto border border-sky-500/20">
-                <Flame className="w-6 h-6 animate-pulse text-sky-450" />
-              </div>
-              <h4 className="text-sm font-bold text-slate-100">Nenhum termo catalogado como difícil!</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Excelente! Você não possui termos marcados com confiança baixa (1 ou 2). Conforme for estudando e se deparar com assuntos que gaguejou para explicar, classifique-os com 1 ou 2 estrelas para que eles apareçam nessa seção automaticamente.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {difficultTerms.map((term) => {
-                const confVal = termConfidence[term.id] || 0;
-                return (
-                  <div
-                    key={term.id}
-                    onClick={() => onSelectTerm(term)}
-                    className="p-4 bg-slate-900 hover:bg-slate-950 border border-slate-800 hover:border-orange-500/35 rounded-xl cursor-pointer transition-all space-y-2 relative flex flex-col justify-between"
-                    id={`difficult-term-card-${term.id}`}
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <h4 className="text-sm font-bold text-slate-100 font-mono leading-tight">{term.name}</h4>
-                        <span className="text-[9px] font-mono font-bold text-orange-400">★ {confVal}/5</span>
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
                       </div>
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{term.simpleExplanation}</p>
+
+                      <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                        {status}
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-slate-850/50 pt-2 text-[10px] text-slate-500">
-                      <span>{term.category}</span>
-                      <span className="text-sky-400 font-bold flex items-center gap-0.5">Estudar <ChevronRight className="w-3.5 h-3.5" /></span>
-                    </div>
+                    <p className="line-clamp-2 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
+
+                  <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-neutral-500">
+                    <span className="font-mono uppercase">Nível {term.level}</span>
+                    <span className="inline-flex items-center gap-1 text-teal-300">
+                      {subTab === 'dificeis' ? `Confiança ${confidence}/5` : 'Abrir'}
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 };

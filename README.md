@@ -1,20 +1,16 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# .NET Interview Roadmap
 
-# Run and deploy your AI Studio app
+Um app de estudo para revisar C# e .NET com trilha, roadmap, simulador e foco em sessão curta.
 
-This contains everything you need to run your app locally.
+## Rodar localmente
 
-View your app in AI Studio: https://ai.studio/apps/7d012297-88bf-473d-94d2-3dce47c704ab
+1. Instale as dependências: `npm install`
+2. Inicie o app: `npm run dev`
 
-## Run Locally
+## Build
 
-**Prerequisites:**  Node.js
+`npm run build`
 
+## Deploy no GitHub Pages
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+`npm run deploy`
