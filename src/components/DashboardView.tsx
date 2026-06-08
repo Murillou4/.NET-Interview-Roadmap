@@ -60,6 +60,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const learnedCount = terms.filter((term) => termStatus[term.id] === 'aprendido').length;
   const reviewingCount = terms.filter((term) => termStatus[term.id] === 'revisar').length;
   const progressPercent = totalCount > 0 ? Math.round((learnedCount / totalCount) * 100) : 0;
+  const hasStartedStudying = terms.some((term) => {
+    const status = termStatus[term.id];
+    return status && status !== 'não estudado';
+  });
 
   const recommendedTerm =
     terms.find((term) => !termStatus[term.id] || termStatus[term.id] === 'não estudado' || termStatus[term.id] === 'estudando') ||
@@ -107,7 +111,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   id="btn-recommended-term"
                 >
                   <Play className="h-4 w-4 fill-current" />
-                  Continuar estudo
+                  {hasStartedStudying ? 'Continuar estudo' : 'Iniciar estudos'}
                 </button>
 
                 <button
