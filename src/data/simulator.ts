@@ -4,11 +4,11 @@ export const SIMULATOR_QUESTIONS: SimulatorQuestion[] = [
   {
     id: 'class-vs-struct',
     question: 'Qual a diferença crucial entre class e struct no .NET?',
-    idealShortAnswer: 'Class é um tipo de referência (Reference Type) guardado na Heap e gerenciado pelo GC. Struct é um tipo de valor (Value Type) guardado geralmente na Stack, copiado por valor absoluto nas atribuições.',
-    idealCompleteAnswer: 'Classes são Reference Types alocados na memória Heap, suportam herança e admitem referências nulas. Structs são Value Types alocados de forma compacta (usualmente na Stack), copiados por valor inteiro em cada atribuição ou passagem de parâmetros, e não suportam herança direta, sendo excelentes para pequenos blocos de dados imutáveis.',
+    idealShortAnswer: 'Class é um tipo de referência: a variável guarda uma referência para um objeto. Struct é um tipo de valor: a variável carrega os dados por valor e cada atribuição faz uma cópia.',
+    idealCompleteAnswer: 'Classes são Reference Types. A variável guarda uma referência para um objeto, e esse objeto vive no managed heap. Structs são Value Types: a variável contém os próprios dados e cada atribuição ou passagem de parâmetro copia o conteúdo. O local físico na memória depende do contexto, então não trate Stack como regra absoluta.',
     expectedPoints: [
       'Reference Type vs Value Type',
-      'Memória Heap (Classes) vs Stack (Structs)',
+      'Valor por referência (classes) vs valor por cópia (structs)',
       'Suporte a herança (apenas classes)',
       'Comportamento de cópia de valores nas atribuições'
     ],
@@ -160,13 +160,13 @@ export const SIMULATOR_QUESTIONS: SimulatorQuestion[] = [
   {
     id: 'what-is-jwt',
     question: 'O que é JWT e como ele se estrutura?',
-    idealShortAnswer: 'Um padrão de transmissão assinado e autocontido composto por Header (algoritmo), Payload (dados de claims) e Signature (criptografia anti-fraudes), separados por pontos.',
-    idealCompleteAnswer: 'JSON Web Token é um crachá legível por qualquer navegador, codificado em Base64, e assinado digitalmente. É dividido em: Header (tipo e algoritmo), Payload (dados compartilhados do usuário chamados Claims) e Signature (assinatura simétrica ou assimétrica calculada pelo servidor .NET com chave secreta que veta qualquer adulteração externa).',
+    idealShortAnswer: 'Um padrão compacto e assinado composto por Header, Payload e Signature, separados por pontos. O payload é Base64Url, então não é criptografado por padrão.',
+    idealCompleteAnswer: 'JSON Web Token é um token compacto e autocontido definido na RFC 7519. Ele é dividido em Header (tipo e algoritmo), Payload (claims do usuário) e Signature (assinatura calculada pelo servidor com uma chave secreta ou chave assimétrica). O payload é legível porque é apenas Base64Url; a assinatura protege a integridade do conteúdo.',
     expectedPoints: [
       'Autocontido e compacto de segurança',
       'Header, Payload e Signature',
       'Separação por caracteres ponto (.)',
-      'Segurança e cálculo de assinatura por chaves secretas contra fraudes'
+      'Payload Base64Url legível e assinatura para integridade'
     ],
     category: 'Autenticação e autorização'
   },
@@ -265,11 +265,11 @@ export const SIMULATOR_QUESTIONS: SimulatorQuestion[] = [
     id: 'what-is-entity-framework',
     question: 'O que é o Entity Framework Core?',
     idealShortAnswer: 'O principal ORM do .NET, que mapeia classes C# para tabelas, traduzindo LINQ amigável para comandos remotos SQL.',
-    idealCompleteAnswer: 'Entity Framework (EF) Core é o ORM oficial open-source da Microsoft. Ele abstrai acessos de conexões físicas de ADO.NET gerando scripts SQL de inserções ou leituras complexas. Opera centralizado no DbContext agindo nos padrões Repository e de Unit of Work.',
+    idealCompleteAnswer: 'Entity Framework Core é o ORM oficial open-source da Microsoft. Ele mapeia classes C# para tabelas, traduz LINQ para SQL e usa o DbContext para rastrear mudanças e persistir alterações quando SaveChangesAsync é chamado.',
     expectedPoints: [
       'Mapeamento Objeto-Relacional (ORM) oficial da Microsoft',
       'Abstração de comandos SQL por meio de lógicas C# strongly-typed',
-      'DbContext acionando os padrões Repository e de Unit of Work',
+      'DbContext rastreando mudanças e persistindo com SaveChanges',
       'Tradução do compilador LINQ para dialetos específicos de bancos'
     ],
     category: 'Entity Framework Core'
