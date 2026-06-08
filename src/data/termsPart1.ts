@@ -6,20 +6,20 @@ export const TERMS_PART1: StudyTerm[] = [
     name: 'class',
     level: 'básico',
     category: 'C# básico/intermediário',
-    simpleExplanation: 'Classe é o molde para criar objetos. É um tipo de referência (Reference Type), ou seja, quando você passa uma classe para outra parte do código, você está passando o caminho da memória de onde ela está e não uma cópia.',
-    interviewExplanation: 'Em C#, uma class define uma estrutura de dados que combina campos, propriedades e métodos. Ela é alocada na memória Heap e gerenciada pelo Garbage Collector. É copiada por referência, indicando que duas variáveis podem apontar para o mesmo objeto.',
+    simpleExplanation: 'Classe é o molde para criar objetos com estado e comportamento. É um tipo de referência (Reference Type): a variável guarda uma referência para o objeto, e mais de uma variável pode apontar para a mesma instância.',
+    interviewExplanation: 'Em C#, uma class combina dados e comportamentos por meio de campos, propriedades e métodos. Ao atribuir uma variável de classe a outra, a referência é copiada, não o objeto. Por isso, alterações feitas por uma variável podem ser vistas pela outra quando ambas apontam para a mesma instância.',
     practicalExample: 'public class Cliente {\n  public string Nome { get; set; }\n  public void Ativar() { /* ativa o cliente */ }\n}',
     whenToUse: 'Sempre que você precisar modelar entidades de negócio complexas, serviços da aplicação ou controllers.',
-    commonErrors: ['Tentar comparar duas instâncias de classe usando == esperando comparação de valores (vão dar falso a menos que apontem para o mesmo endereço, use Equals ou override do == se necessário).', 'Alocar milhares de classes temporárias minúsculas sem necessidade, gerando estresse desnecessário no Garbage Collector.'],
-    interviewQuestion: 'Qual a diferença crucial entre uma class e uma struct no C#?',
-    shortInterviewAnswer: 'Class é um tipo de referência (Reference Type) carregado na Heap e gerenciado pelo Garbage Collector, enquanto struct é um tipo de valor (Value Type) carregado geralmente na Stack, mais rápido para dados pequenos e imutáveis.',
-    betterInterviewAnswer: 'Classes são Reference Types. Quando passadas como parâmetro, enviamos a referência da memória Heap. Elas aceitam herança e inicialização nula (null). Já as structs são Value Types na Stack, copiadas por valor completo em todas as atribuições, e não suportam herança direta, sendo excelentes para pequenos conjuntos de dados imutáveis (como coordenadas ou moedas).',
+    commonErrors: ['Usar == esperando comparação automática de todas as propriedades. Por padrão, classes usam igualdade de referência, salvo quando o tipo redefine esse comportamento.', 'Criar objetos temporários em excesso sem necessidade, aumentando o trabalho do Garbage Collector.'],
+    interviewQuestion: 'O que significa dizer que uma class é um tipo de referência no C#?',
+    shortInterviewAnswer: 'Significa que a variável guarda uma referência para o objeto. Ao atribuí-la a outra variável, copiamos a referência, então as duas podem apontar para a mesma instância.',
+    betterInterviewAnswer: 'Uma variável de class não contém diretamente todos os dados do objeto: ela contém uma referência para uma instância no managed heap. Ao copiar essa variável, o objeto não é clonado; a nova variável aponta para a mesma instância. Assim, uma alteração feita por uma referência pode ser observada pela outra. Classes também suportam herança e identidade compartilhada.',
     tags: ['C#', 'OOP', 'Reference Type'],
     quiz: {
-      question: 'Onde instâncias de uma "class" são alocadas principalmente na memória do .NET?',
-      options: ['Na Stack (fila rápida)', 'Na memória Heap', 'No arquivo de paginação', 'No cache de registradores'],
+      question: 'O que acontece ao atribuir uma variável de class a outra variável?',
+      options: ['O objeto é clonado automaticamente', 'A referência para o mesmo objeto é copiada', 'A variável original é apagada', 'Todas as propriedades são zeradas'],
       answerIndex: 1,
-      explanation: 'Sendo tipos de referência (Reference Types), os objetos das classes são guardados na memória Heap.'
+      explanation: 'Classes são tipos de referência. A atribuição copia a referência, então as duas variáveis podem apontar para a mesma instância.'
     }
   },
   {
@@ -32,15 +32,15 @@ export const TERMS_PART1: StudyTerm[] = [
     practicalExample: 'public struct GeoPonto {\n  public double Latitude { get; }\n  public double Longitude { }\n  public GeoPonto(double lat, double lon) { Latitude = lat; Longitude = lon; }\n}',
     whenToUse: 'Para representar conceitos matemáticos ou de domínio pequenos, imutáveis e de vida curta (ex: coordenadas, frações, cores RGB).',
     commonErrors: ['Criar structs gigantescas (causando lentidão ao passar por parâmetros por causa da cópia)', 'Criar structs mutáveis (gerando confusão já que alterações em cópias não se refletem na struct original).'],
-    interviewQuestion: 'Structs no C# herdam de alguma outra estrutura ou classe?',
-    shortInterviewAnswer: 'Structs não suportam herança. Elas herdam implicitamente de System.ValueType e podem implementar interfaces, mas não podem ter classes herdadas.',
-    betterInterviewAnswer: 'No C#, structs são implicitamente seladas (sealed) e não podem herdar de outras classes ou structs. No entanto, todas as structs herdam indiretamente de System.ValueType e podem implementar uma ou mais interfaces. Devemos evitar usá-las para lógicas de herança de classes.',
+    interviewQuestion: 'Qual é a principal diferença entre class e struct no C#?',
+    shortInterviewAnswer: 'Class é um tipo de referência: a atribuição copia a referência para o mesmo objeto. Struct é um tipo de valor: a atribuição copia os dados para uma nova variável.',
+    betterInterviewAnswer: 'Classes têm semântica de referência, permitem que duas variáveis apontem para a mesma instância e suportam herança. Structs têm semântica de valor: cada atribuição ou passagem por valor copia seus dados, e elas não participam de hierarquias de herança de classes. O local físico de uma struct na memória depende do contexto; a diferença essencial é a semântica de cópia.',
     tags: ['C#', 'Value Type', 'Memory'],
     quiz: {
       question: 'O que acontece ao passar uma "struct" como parâmetro para um método por padrão?',
-      options: ['Passa a referência exata na Heap', 'Lança uma exceção de compilação', 'O .NET faz uma cópia completa dos seus valores na Stack', 'A struct é automaticamente destruída'],
+      options: ['Passa uma referência para a mesma instância', 'Lança uma exceção de compilação', 'Uma cópia do valor é passada ao método', 'A struct é automaticamente destruída'],
       answerIndex: 2,
-      explanation: 'Sendo um tipo de valor, sua passagem padrão faz uma cópia de todos os seus dados internos.'
+      explanation: 'Por padrão, a passagem de um tipo de valor copia o valor. O local físico na memória depende do contexto e não define essa semântica.'
     }
   },
   {

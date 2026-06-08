@@ -32,7 +32,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
   const [showAnswer, setShowAnswer] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
   const relatedTermByQuestionId: Record<string, string> = {
-    'class-vs-struct': 'class',
+    'class-vs-struct': 'struct',
     'what-is-interface': 'interface',
     'async-await': 'async',
     'what-is-linq': 'linq',
