@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label=".NET Interview Roadmap">
+  <rect width="1200" height="630" fill="#05080d"/>
+  <rect x="48" y="48" width="1104" height="534" rx="32" fill="#0d141b" stroke="#1c2b36"/>
+  <path d="M96 118H1104" stroke="#20313d"/>
+  <path d="M96 520H1104" stroke="#20313d"/>
+  <rect x="96" y="116" width="148" height="40" rx="12" fill="#11242a" stroke="#2a4d52"/>
+  <text x="124" y="142" fill="#7ee7d1" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Roadmap</text>
+  <text x="96" y="230" fill="#ecf2f4" font-size="64" font-family="Arial, Helvetica, sans-serif" font-weight="800">.NET Interview Roadmap</text>
+  <text x="96" y="288" fill="#9fb0bb" font-size="28" font-family="Arial, Helvetica, sans-serif">Sessão de estudo curta para C# e backend, com revisão guiada, roadmap e simulador.</text>
+  <rect x="96" y="350" width="260" height="108" rx="20" fill="#111a21" stroke="#263541"/>
+  <rect x="380" y="350" width="260" height="108" rx="20" fill="#111a21" stroke="#263541"/>
+  <rect x="664" y="350" width="260" height="108" rx="20" fill="#111a21" stroke="#263541"/>
+  <text x="124" y="390" fill="#dfe7eb" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Trilha</text>
+  <text x="124" y="428" fill="#8fa1ad" font-size="18" font-family="Arial, Helvetica, sans-serif">Estude por etapa</text>
+  <text x="408" y="390" fill="#dfe7eb" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Revisão</text>
+  <text x="408" y="428" fill="#8fa1ad" font-size="18" font-family="Arial, Helvetica, sans-serif">Volte ao que pesa</text>
+  <text x="692" y="390" fill="#dfe7eb" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Simulado</text>
+  <text x="692" y="428" fill="#8fa1ad" font-size="18" font-family="Arial, Helvetica, sans-serif">Treine respostas</text>
+  <circle cx="998" cy="400" r="84" fill="#102428" stroke="#2f6860"/>
+  <path d="M980 400h36M998 382v36" stroke="#7ee7d1" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="998" cy="400" r="40" stroke="#dfe7eb" stroke-opacity=".25" stroke-width="2"/>
+</svg>
