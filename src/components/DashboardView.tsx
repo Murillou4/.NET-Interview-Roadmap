@@ -112,7 +112,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   type="button"
                   onClick={onReviewHardTerms}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
-                  id="btn-review-hard-terms"
+                  id="btn-review-hard-terms-hero"
                 >
                   <RotateCcw className="h-4 w-4" />
                   Ver difíceis

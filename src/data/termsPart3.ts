@@ -338,6 +338,69 @@ export const TERMS_PART3: StudyTerm[] = [
     }
   },
   {
+    id: 'performance',
+    name: 'performance',
+    level: 'intermediário',
+    category: 'Performance',
+    simpleExplanation: 'Performance é a capacidade do backend responder rápido, gastar pouca memória e não travar quando muitas pessoas usam a API ao mesmo tempo. No .NET, isso passa por boas queries, menos alocações, cache, paginação e operações assíncronas bem usadas.',
+    interviewExplanation: 'Em aplicações .NET, performance envolve medir gargalos reais antes de otimizar. Usamos logs, métricas, profiling, AsNoTracking em leituras, paginação, índices no banco, cache e async/await para liberar threads em operações de I/O.',
+    practicalExample: 'var clientes = await _db.Clientes\n  .AsNoTracking()\n  .Where(c => c.Ativo)\n  .OrderBy(c => c.Nome)\n  .Take(50)\n  .ToListAsync();',
+    whenToUse: 'Sempre que uma rota estiver lenta, consumir muita memória, bater no banco demais ou quando o sistema precisa atender muitas requisições sem perder estabilidade.',
+    commonErrors: ['Otimizar no escuro sem medir o gargalo real com logs, métricas ou profiler.', 'Retornar listas enormes sem paginação, fazendo a API carregar dados demais na memória e no JSON.'],
+    interviewQuestion: 'Como você investigaria um problema de performance em uma API .NET?',
+    shortInterviewAnswer: 'Eu mediria primeiro: logs, métricas, tempo de query e uso de memória. Depois atacaria o gargalo real, como query sem índice, N+1, falta de paginação, cache ausente ou uso incorreto de async.',
+    betterInterviewAnswer: 'Eu começaria por observabilidade: tempo por endpoint, SQL gerado, contagem de chamadas ao banco, alocações e erros. Em seguida, aplicaria correções focadas: paginação, projeções com Select, AsNoTracking em leitura, índices, cache com TTL e remoção de loops que disparam queries repetidas. Performance boa nasce de medição, não de chute.',
+    tags: ['Performance', 'Profiling', 'EF Core', 'Cache'],
+    quiz: {
+      question: 'Qual é o primeiro passo mais seguro ao investigar lentidão em uma API?',
+      options: ['Adicionar cache em tudo imediatamente', 'Medir o gargalo real com logs, métricas ou profiler', 'Trocar todo o backend de linguagem', 'Remover todos os testes unitários'],
+      answerIndex: 1,
+      explanation: 'Sem medição, a otimização vira chute. Primeiro descobrimos onde o tempo ou a memória estão sendo gastos.'
+    }
+  },
+  {
+    id: 'seguranca',
+    name: 'segurança',
+    level: 'intermediário',
+    category: 'Segurança',
+    simpleExplanation: 'Segurança no backend é proteger dados, identidade e regras do sistema. Envolve autenticação, autorização, validação de entrada, cuidado com senhas, tokens, logs e ataques como SQL Injection ou exposição de dados sensíveis.',
+    interviewExplanation: 'Em Web APIs .NET, segurança passa por autenticar corretamente, aplicar autorização por policies/roles, validar DTOs, nunca confiar no cliente, usar hashing forte para senhas, HTTPS, proteção contra SQL Injection e tratamento de erros sem vazar stack trace.',
+    practicalExample: '[Authorize]\n[HttpPost]\npublic async Task<IActionResult> CriarPedido(CriarPedidoDto dto) {\n  if (!ModelState.IsValid) return BadRequest(ModelState);\n  return Ok(await _service.CriarAsync(dto));\n}',
+    whenToUse: 'Em todas as rotas e fluxos que lidam com dados de usuários, permissões, pagamentos, cadastros, arquivos, tokens ou integrações externas.',
+    commonErrors: ['Confiar em dados enviados pelo frontend sem validação no backend.', 'Salvar senha em texto puro ou registrar tokens e dados sensíveis nos logs.'],
+    interviewQuestion: 'Quais cuidados básicos de segurança você aplicaria em uma Web API .NET?',
+    shortInterviewAnswer: 'Eu validaria entradas, usaria autenticação e autorização corretas, protegeria senhas com hash, evitaria SQL Injection, não vazaria dados sensíveis em logs ou erros e aplicaria HTTPS.',
+    betterInterviewAnswer: 'Eu trataria segurança em camadas: DTOs validados, autenticação via JWT ou provedor confiável, autorização por policy, queries parametrizadas/EF Core contra injection, senhas com hash forte, secrets fora do código, HTTPS, logs sem dados sensíveis e middleware global para retornar erros seguros sem expor stack trace.',
+    tags: ['Segurança', 'Auth', 'JWT', 'Validation'],
+    quiz: {
+      question: 'Qual prática é perigosa em uma API .NET?',
+      options: ['Validar DTOs no backend', 'Usar queries parametrizadas', 'Salvar senhas em texto puro', 'Aplicar autorização em endpoints privados'],
+      answerIndex: 2,
+      explanation: 'Senhas nunca devem ser salvas em texto puro. O correto é usar hash forte com salt e uma estratégia segura.'
+    }
+  },
+  {
+    id: 'git',
+    name: 'Git',
+    level: 'básico',
+    category: 'Git e trabalho em equipe',
+    simpleExplanation: 'Git é o sistema de versionamento que registra a história do código. Ele permite trabalhar em branches, revisar mudanças, voltar versões e colaborar com outras pessoas sem perder controle do projeto.',
+    interviewExplanation: 'No dia a dia de backend, Git organiza colaboração: branches para features, commits pequenos, pull requests, resolução de conflitos e histórico rastreável. Em entrevistas, importa mostrar que você entende fluxo de equipe, não só comandos decorados.',
+    practicalExample: 'git checkout -b feature/criar-clientes\ngit add .\ngit commit -m "Add customer creation endpoint"\ngit push origin feature/criar-clientes',
+    whenToUse: 'Sempre no desenvolvimento profissional: para versionar mudanças, abrir PRs, revisar código, criar releases e manter um histórico seguro do projeto.',
+    commonErrors: ['Fazer commits gigantes misturando várias mudanças sem relação.', 'Resolver conflitos sem entender os dois lados do código, apagando trabalho de outra pessoa.'],
+    interviewQuestion: 'Como você costuma organizar seu trabalho com Git em equipe?',
+    shortInterviewAnswer: 'Eu crio uma branch por tarefa, faço commits pequenos, abro pull request, reviso conflitos com cuidado e mantenho a main estável.',
+    betterInterviewAnswer: 'Eu separo o trabalho em branches pequenas e descritivas, mantenho commits com escopo claro, sincronizo com a main antes do PR, resolvo conflitos entendendo o contexto dos dois lados e uso o pull request para revisão técnica. Isso reduz risco de regressão e facilita rastrear o motivo de cada mudança.',
+    tags: ['Git', 'Branch', 'Pull Request', 'Teamwork'],
+    quiz: {
+      question: 'Por que commits pequenos e focados ajudam uma equipe?',
+      options: ['Porque impedem qualquer bug automaticamente', 'Porque facilitam revisão, rollback e entendimento da mudança', 'Porque removem a necessidade de testes', 'Porque tornam o banco de dados mais rápido'],
+      answerIndex: 1,
+      explanation: 'Commits focados deixam o histórico legível, tornam revisão mais simples e permitem desfazer mudanças específicas com menos risco.'
+    }
+  },
+  {
     id: 'docker',
     name: 'Docker',
     level: 'intermediário',
