@@ -101,12 +101,12 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
 
   return (
     <div className="space-y-5 animate-fadeIn">
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 2xl:grid-cols-4">
         <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
           <div className="flex items-center gap-3">
             <BookOpen className="h-8 w-8 shrink-0 text-teal-300" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Respondidas</p>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Respondidas</p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-neutral-100">
                 {answeredCount}/{totalQuestions}
               </p>
@@ -117,8 +117,8 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
           <div className="flex items-center gap-3">
             <CheckCircle className="h-8 w-8 shrink-0 text-emerald-300" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Acertei</p>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Acertei</p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-emerald-300">{acerteiCount}</p>
             </div>
           </div>
@@ -127,8 +127,8 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-8 w-8 shrink-0 text-amber-300" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Meio termo</p>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Meio termo</p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-amber-300">{maisOuMenosCount}</p>
             </div>
           </div>
@@ -137,21 +137,21 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         <article className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
           <div className="flex items-center gap-3">
             <Trophy className="h-8 w-8 shrink-0 text-teal-300" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Aproveitamento</p>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Aproveitamento</p>
               <p className="font-mono text-2xl font-semibold tabular-nums text-neutral-100">{scorePercent}%</p>
             </div>
           </div>
         </article>
       </section>
 
-      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-7">
         <div className="flex flex-col gap-4 border-b border-white/[0.08] pb-4 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-2">
-            <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+          <div className="min-w-0 space-y-2">
+            <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
               Simulado técnico
             </span>
-            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Categoria: {currentQuestion.category}</p>
+            <p className="text-xs uppercase leading-5 tracking-[0.12em] text-neutral-500">Categoria: {currentQuestion.category}</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -181,7 +181,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         <div className="mt-5 rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-5">
           <div className="flex items-center gap-2">
             <HelpCircle className="h-4 w-4 text-teal-300" />
-            <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Pergunta do entrevistador</h3>
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-300">Pergunta do entrevistador</h3>
           </div>
           <p className="mt-3 text-lg font-bold leading-snug text-neutral-100 md:text-xl">
             {currentQuestion.question}
@@ -190,10 +190,10 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
 
         <div className="mt-5 space-y-2">
           <div className="flex items-center justify-between gap-3">
-            <label className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">
+            <label className="text-xs font-semibold uppercase leading-5 tracking-[0.1em] text-neutral-500">
               Escreva ou esquematize sua resposta
             </label>
-            <span className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">Simulador local</span>
+            <span className="shrink-0 text-[10px] uppercase tracking-[0.1em] text-neutral-500">Simulador local</span>
           </div>
 
           <textarea

@@ -43,7 +43,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
 
   return (
     <div className="space-y-5 animate-fadeIn">
-      <div className="inline-flex rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1">
+      <div className="inline-flex max-w-full overflow-x-auto rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1">
         <button
           type="button"
           onClick={() => setSubTab('revisar')}
@@ -67,22 +67,22 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
         </button>
       </div>
 
-      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-2">
+      <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0 space-y-2">
             <div className="flex items-center gap-2">
               {subTab === 'revisar' ? (
                 <Clock className="h-5 w-5 text-teal-300" />
               ) : (
                 <AlertTriangle className="h-5 w-5 text-amber-300" />
               )}
-              <h3 className="text-lg font-bold tracking-tight text-neutral-100">{title}</h3>
+              <h3 className="text-pretty text-lg font-bold tracking-tight text-neutral-100">{title}</h3>
             </div>
-            <p className="max-w-2xl text-sm leading-6 text-neutral-400">{description}</p>
+            <p className="max-w-3xl text-pretty text-sm leading-6 text-neutral-400">{description}</p>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 px-4 py-3">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Itens na fila</p>
+          <div className="w-full rounded-2xl border border-white/[0.08] bg-neutral-950/80 px-4 py-3 md:w-40 md:shrink-0">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Itens na fila</p>
             <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-neutral-100">{activeTerms.length}</p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-6 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
             {activeTerms.map((term) => {
               const status = termStatus[term.id] || 'não estudado';
               const confidence = termConfidence[term.id] || 0;
@@ -118,17 +118,17 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
                   key={term.id}
                   type="button"
                   onClick={() => onSelectTerm(term)}
-                  className="flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
+                  className="flex h-full min-h-[11.5rem] flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
                   id={`${subTab}-term-card-${term.id}`}
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
+                      <div className="min-w-0 space-y-1">
                         <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
+                        <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
                       </div>
 
-                      <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                      <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
                         {status}
                       </span>
                     </div>

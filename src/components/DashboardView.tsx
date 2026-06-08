@@ -82,26 +82,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   return (
-    <div className="space-y-5 animate-fadeIn">
-      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <article className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+    <div className="space-y-6 animate-fadeIn">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(22rem,0.75fr)]">
+        <article className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-7">
+          <div className="grid gap-6 min-[1800px]:grid-cols-[minmax(0,1fr)_minmax(20rem,22rem)] min-[1800px]:items-end">
+            <div className="min-w-0 space-y-4">
+              <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
                 Sessão atual
               </span>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">Estudo de backend sem ruído</h2>
-                <p className="max-w-xl text-sm leading-6 text-neutral-400">
+              <div className="space-y-3">
+                <h2 className="max-w-3xl text-balance text-2xl font-extrabold leading-tight tracking-tight md:text-3xl">
+                  Estudo de backend sem ruído
+                </h2>
+                <p className="max-w-2xl text-pretty text-sm leading-6 text-neutral-400">
                   Abra um termo, marque o estado e siga adiante. O painel fica curto de propósito.
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={() => onSelectTerm(recommendedTerm)}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-teal-400/25 bg-teal-400 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-teal-300 active:scale-[0.99]"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-teal-400/25 bg-teal-400 px-4 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-teal-300 active:scale-[0.99] sm:px-5"
                   id="btn-recommended-term"
                 >
                   <Play className="h-4 w-4 fill-current" />
@@ -111,7 +113,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button
                   type="button"
                   onClick={onReviewHardTerms}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99]"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-neutral-200 transition hover:bg-white/[0.06] active:scale-[0.99] sm:px-5"
                   id="btn-review-hard-terms-hero"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -120,31 +122,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
 
-            <div className="grid min-w-[15rem] grid-cols-3 gap-2">
-              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Progresso</p>
+            <div className="grid grid-cols-3 gap-2 min-[1800px]:min-w-[20rem]">
+              <div className="min-h-[5.75rem] rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3.5">
+                <p className="text-[10px] uppercase leading-4 tracking-[0.1em] text-neutral-500">Progresso</p>
                 <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-neutral-100">{progressPercent}%</p>
               </div>
 
-              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-emerald-300">Aprendidos</p>
+              <div className="min-h-[5.75rem] rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3.5">
+                <p className="text-[10px] uppercase leading-4 tracking-[0.1em] text-emerald-300">Aprendidos</p>
                 <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-emerald-300">{learnedCount}</p>
               </div>
 
-              <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-amber-300">Em revisão</p>
+              <div className="min-h-[5.75rem] rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-3.5">
+                <p className="text-[10px] uppercase leading-4 tracking-[0.1em] text-amber-300">Em revisão</p>
                 <p className="mt-2 font-mono text-2xl font-semibold tabular-nums text-amber-300">{reviewingCount}</p>
               </div>
             </div>
           </div>
         </article>
 
-        <aside className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+        <aside className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 xl:p-7">
           <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Próximo termo</p>
+            <div className="min-w-0 space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">Próximo termo</p>
               <h3 className="text-lg font-extrabold tracking-tight text-neutral-100">{recommendedTerm.name}</h3>
-              <p className="line-clamp-3 text-sm leading-6 text-neutral-400">{recommendedTerm.simpleExplanation}</p>
+              <p className="line-clamp-3 text-pretty text-sm leading-6 text-neutral-400">{recommendedTerm.simpleExplanation}</p>
             </div>
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-400/10 text-teal-300">
               <Lightbulb className="h-5 w-5" />
@@ -152,14 +154,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-300">
+            <span className="max-w-full rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-neutral-300">
               {recommendedTerm.category}
             </span>
-            <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-300">
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-neutral-300">
               Nível {recommendedTerm.level}
             </span>
             {termConfidence[recommendedTerm.id] ? (
-              <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-300">
+              <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-300">
                 Confiança {termConfidence[recommendedTerm.id]}/5
               </span>
             ) : null}
@@ -176,7 +178,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </aside>
       </section>
 
-      <section className="flex flex-col gap-3 border-t border-white/[0.08] pt-5 md:flex-row md:items-end md:justify-between">
+      <section className="flex flex-col gap-4 border-t border-white/[0.08] pt-6 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-teal-300" />
@@ -190,7 +192,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <button
           type="button"
           onClick={onReviewHardTerms}
-          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/15 active:scale-[0.99]"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/15 active:scale-[0.99] md:self-auto"
           id="btn-review-hard-terms"
         >
           <Clock className="h-4 w-4" />
@@ -199,9 +201,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </section>
 
       {searchQuery ? (
-        <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+        <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 xl:p-7">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">
               Resultado da pesquisa ({filteredTerms.length})
             </p>
             <Search className="h-4 w-4 text-neutral-500" />
@@ -214,7 +216,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <p className="mt-2 text-sm text-neutral-500">Tente algo como class, async ou join.</p>
             </div>
           ) : (
-            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
               {filteredTerms.map((term) => {
                 const status = termStatus[term.id] || 'não estudado';
 
@@ -223,15 +225,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     key={term.id}
                     type="button"
                     onClick={() => onSelectTerm(term)}
-                    className="group flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
+                    className="group flex h-full min-h-[11.5rem] flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
+                        <div className="min-w-0 space-y-1">
                           <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
-                          <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
+                          <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
                         </div>
-                        <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                        <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
                           {status}
                         </span>
                       </div>
@@ -253,7 +255,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </section>
       ) : (
         <div className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
             {STUDY_CATEGORIES.map((category) => {
               const stats = getCategoryStats(category);
               const isSelected = selectedCategory === category;
@@ -263,20 +265,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(isSelected ? null : category)}
-                  className={`rounded-2xl border p-4 text-left transition duration-200 ${
+                  className={`min-h-[9.5rem] rounded-2xl border p-4 text-left transition duration-200 ${
                     isSelected
                       ? 'border-teal-400/25 bg-teal-400/10'
                       : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.05]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-neutral-100">{category}</p>
-                      <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-pretty text-sm font-semibold leading-5 text-neutral-100">{category}</p>
+                      <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
                         {stats.learned}/{stats.total} termos
                       </p>
                     </div>
-                    <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
+                    <span className="shrink-0 rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
                       {stats.percent}%
                     </span>
                   </div>
@@ -303,11 +305,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {selectedCategory ? (
-            <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6">
+            <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 xl:p-7">
               <div className="flex flex-col gap-3 border-b border-white/[0.08] pb-4 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Filtro ativo</p>
-                  <h4 className="text-base font-bold text-neutral-100">{selectedCategory}</h4>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">Filtro ativo</p>
+                  <h4 className="text-pretty text-base font-bold text-neutral-100">{selectedCategory}</h4>
                 </div>
 
                 <button
@@ -319,7 +321,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </button>
               </div>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
                 {currentCategoryTerms.map((term) => {
                   const status = termStatus[term.id] || 'não estudado';
                   const confidence = termConfidence[term.id] || 0;
@@ -329,15 +331,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       key={term.id}
                       type="button"
                       onClick={() => onSelectTerm(term)}
-                      className="flex h-full flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
+                      className="flex h-full min-h-[11.5rem] flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
                     >
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1">
+                          <div className="min-w-0 space-y-1">
                             <h5 className="text-sm font-bold text-neutral-100">{term.name}</h5>
-                            <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-500">{term.category}</p>
+                            <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
                           </div>
-                          <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getStatusStyles(status)}`}>
+                          <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
                             {status}
                           </span>
                         </div>

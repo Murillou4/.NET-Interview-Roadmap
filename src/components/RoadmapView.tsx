@@ -25,22 +25,22 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
 
   return (
     <div className="space-y-5 animate-fadeIn">
-      <section className="flex flex-col gap-4 rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-2">
-          <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+      <section className="flex flex-col gap-5 rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-7 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0 space-y-2">
+          <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
             Cronograma recomendado
           </span>
           <div className="flex items-center gap-2">
             <Compass className="h-5 w-5 text-teal-300" />
-            <h2 className="text-xl font-extrabold tracking-tight md:text-2xl">Trilha evolutiva do C#</h2>
+            <h2 className="text-balance text-xl font-extrabold tracking-tight md:text-2xl">Trilha evolutiva do C#</h2>
           </div>
-          <p className="max-w-2xl text-sm leading-6 text-neutral-400">
+          <p className="max-w-3xl text-pretty text-sm leading-6 text-neutral-400">
             Estude em ordem curta. Cada etapa mostra o que abrir agora e quanto falta para fechar o bloco.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-4">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Foco atual sugerido</p>
+        <div className="w-full rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-4 lg:w-80 lg:shrink-0">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Foco atual sugerido</p>
           <p className="mt-2 text-sm font-semibold text-neutral-100">{nextTargetStep.title}</p>
           <p className="mt-1 text-xs text-neutral-500">Tempo estimado: {nextTargetStep.recommendedDuration}</p>
         </div>
@@ -78,8 +78,8 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
                       : 'border-white/[0.06] bg-white/[0.02] opacity-70'
                 }`}
               >
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="space-y-2">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Etapa {step.id}</span>
                       <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-300">
@@ -103,11 +103,11 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
                       )}
                     </div>
 
-                    <h3 className="text-lg font-bold tracking-tight text-neutral-100">{step.title}</h3>
-                    <p className="max-w-3xl text-sm leading-6 text-neutral-400">{step.description}</p>
+                    <h3 className="text-pretty text-lg font-bold tracking-tight text-neutral-100">{step.title}</h3>
+                    <p className="max-w-4xl text-pretty text-sm leading-6 text-neutral-400">{step.description}</p>
                   </div>
 
-                  <div className="min-w-[9rem] space-y-2">
+                  <div className="w-full space-y-2 lg:w-44 lg:shrink-0">
                     <div className="flex items-center justify-between gap-3 text-xs text-neutral-500">
                       <span className="font-mono tabular-nums">
                         {learnedTermsCount}/{totalTermsCount}

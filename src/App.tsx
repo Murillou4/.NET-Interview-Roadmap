@@ -121,8 +121,8 @@ export default function App() {
           difficultCount={difficultCount}
         />
 
-        <main className={`min-h-0 flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6 md:pb-8 ${selectedTerm ? 'pb-8' : 'pb-28'}`}>
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+        <main className={`min-h-0 flex-1 overflow-visible px-4 py-5 md:overflow-y-auto md:px-6 md:py-7 md:pb-9 lg:px-8 ${selectedTerm ? 'pb-8' : 'pb-28'}`}>
+          <div className="mx-auto flex w-full max-w-[92rem] flex-col gap-6">
             {selectedTerm ? (
               <TermDetail
                 term={selectedTerm}

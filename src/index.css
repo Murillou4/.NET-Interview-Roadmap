@@ -61,6 +61,14 @@
   .animate-fadeIn {
     animation: fadeIn 0.25s ease-out forwards;
   }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }
 
 @keyframes fadeIn {
