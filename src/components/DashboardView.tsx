@@ -8,7 +8,9 @@ import {
   Play,
   RotateCcw,
   Search,
+  X,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { STUDY_CATEGORIES } from '../data/categories';
 import { StudyStatus, StudyTerm } from '../types';
 import { TechnicalText } from './TechnicalText';
@@ -34,6 +36,92 @@ const getStatusStyles = (status: StudyStatus) => {
       return 'border-white/[0.08] bg-white/[0.03] text-neutral-400';
   }
 };
+
+interface CategoryTermsPanelProps {
+  category: string;
+  terms: StudyTerm[];
+  termStatus: Record<string, StudyStatus>;
+  termConfidence: Record<string, number>;
+  onClose: () => void;
+  onSelectTerm: (term: StudyTerm) => void;
+}
+
+const CategoryTermsPanel: React.FC<CategoryTermsPanelProps> = ({
+  category,
+  terms,
+  termStatus,
+  termConfidence,
+  onClose,
+  onSelectTerm,
+}) => (
+  <div className="flex max-h-[calc(100dvh-6rem)] min-h-0 flex-col">
+    <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] px-4 py-4">
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
+          Termos da categoria
+        </p>
+        <TechnicalText as="h4" className="mt-1 text-base font-bold leading-6 text-neutral-100">
+          {category}
+        </TechnicalText>
+        <p className="mt-1 text-xs text-neutral-500">{terms.length} termos para estudar</p>
+      </div>
+
+      <button
+        type="button"
+        onClick={onClose}
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-neutral-400 transition hover:border-white/[0.14] hover:bg-white/[0.07] hover:text-neutral-100"
+        aria-label="Fechar termos da categoria"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+
+    <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
+      {terms.map((term) => {
+        const status = termStatus[term.id] || 'não estudado';
+        const confidence = termConfidence[term.id] || 0;
+
+        return (
+          <button
+            key={term.id}
+            type="button"
+            onClick={() => onSelectTerm(term)}
+            className="group flex w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-white/[0.08] hover:bg-white/[0.05] active:scale-[0.99]"
+          >
+            <div className="min-w-0">
+              <TechnicalText as="p" className="truncate text-sm font-semibold text-neutral-100">
+                {term.name}
+              </TechnicalText>
+              <p className="mt-1 line-clamp-1 text-xs leading-5 text-neutral-500">
+                {term.simpleExplanation}
+              </p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              {confidence > 0 ? (
+                <span className="hidden text-[10px] font-mono text-neutral-500 sm:inline">
+                  {confidence}/5
+                </span>
+              ) : null}
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  status === 'aprendido'
+                    ? 'bg-emerald-400'
+                    : status === 'revisar'
+                      ? 'bg-amber-300'
+                      : status === 'estudando'
+                        ? 'bg-teal-300'
+                        : 'bg-neutral-700'
+                }`}
+              />
+              <ChevronRight className="h-4 w-4 text-neutral-500 transition group-hover:translate-x-0.5 group-hover:text-teal-300" />
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   terms,
@@ -69,6 +157,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const recommendedTerm =
     terms.find((term) => !termStatus[term.id] || termStatus[term.id] === 'não estudado' || termStatus[term.id] === 'estudando') ||
     terms[0];
+  const selectedCategoryTerms = selectedCategory
+    ? terms.filter((term) => term.category === selectedCategory)
+    : [];
 
   const getCategoryStats = (category: string) => {
     const categoryTerms = terms.filter((term) => term.category === category);
@@ -193,7 +284,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <h3 className="text-lg font-bold tracking-tight text-neutral-100">Categorias de estudo</h3>
           </div>
           <p className="max-w-2xl text-sm leading-6 text-neutral-400">
-            Clique em um bloco para ver os termos dele. Se houver pesquisa ativa, a lista fica ainda mais direta.
+            Selecione uma categoria para abrir os termos ao lado, sem perder o contexto da lista.
           </p>
         </div>
 
@@ -270,7 +361,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
         </section>
       ) : (
-        <div className="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+        <div
+          className={`grid items-start gap-3 transition-[grid-template-columns] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] 2xl:grid-cols-[minmax(0,1fr)_0px] ${
+            selectedCategory ? '2xl:grid-cols-[minmax(0,1fr)_24rem]' : ''
+          }`}
+        >
+          <div className="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3">
             {STUDY_CATEGORIES.map((category) => {
               const stats = getCategoryStats(category);
               const isSelected = selectedCategory === category;
@@ -290,7 +386,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     onClick={() => setSelectedCategory(isSelected ? null : category)}
                     className="block min-h-[9.5rem] w-full p-4 text-left"
                     aria-expanded={isSelected}
-                    aria-controls={`category-terms-${category}`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 space-y-1">
@@ -316,72 +411,66 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </div>
 
                     <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
-                      <span>{isSelected ? 'Termos exibidos abaixo' : 'Abrir conteúdo'}</span>
+                      <span>{isSelected ? 'Painel aberto' : 'Abrir conteúdo'}</span>
                       <span className="inline-flex items-center gap-1 font-semibold text-teal-300">
-                        {isSelected ? 'Ocultar termos' : 'Ver termos'}
+                        {isSelected ? 'Fechar' : 'Ver termos'}
                         <ChevronRight
-                          className={`h-3.5 w-3.5 transition-transform duration-200 ${isSelected ? 'rotate-90' : ''}`}
+                          className={`h-3.5 w-3.5 transition-transform duration-300 ${isSelected ? 'rotate-180' : ''}`}
                         />
                       </span>
                     </div>
                   </button>
 
-                  {isSelected ? (
-                    <div
-                      id={`category-terms-${category}`}
-                      className="border-t border-teal-400/15 bg-neutral-950/35 p-2 animate-fadeIn"
-                    >
-                      <p className="px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
-                        Escolha um termo para estudar
-                      </p>
-
-                      <div className="space-y-1">
-                        {categoryTerms.map((term) => {
-                          const status = termStatus[term.id] || 'não estudado';
-                          const confidence = termConfidence[term.id] || 0;
-
-                          return (
-                            <button
-                              key={term.id}
-                              type="button"
-                              onClick={() => onSelectTerm(term)}
-                              className="group flex w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-white/[0.08] hover:bg-white/[0.05] active:scale-[0.99]"
-                            >
-                              <div className="min-w-0">
-                                <TechnicalText as="p" className="truncate text-sm font-semibold text-neutral-100">
-                                  {term.name}
-                                </TechnicalText>
-                                <p className="mt-1 line-clamp-1 text-xs leading-5 text-neutral-500">
-                                  {term.simpleExplanation}
-                                </p>
-                              </div>
-
-                              <div className="flex shrink-0 items-center gap-2">
-                                {confidence > 0 ? (
-                                  <span className="hidden text-[10px] font-mono text-neutral-500 lg:inline">
-                                    {confidence}/5
-                                  </span>
-                                ) : null}
-                                <span className={`h-2 w-2 rounded-full ${
-                                  status === 'aprendido'
-                                    ? 'bg-emerald-400'
-                                    : status === 'revisar'
-                                      ? 'bg-amber-300'
-                                      : status === 'estudando'
-                                        ? 'bg-teal-300'
-                                        : 'bg-neutral-700'
-                                }`} />
-                                <ChevronRight className="h-4 w-4 text-neutral-500 transition group-hover:translate-x-0.5 group-hover:text-teal-300" />
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : null}
+                  <AnimatePresence initial={false}>
+                    {isSelected ? (
+                      <motion.div
+                        key={`mobile-${category}`}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="border-t border-teal-400/15 bg-neutral-950/35 2xl:hidden"
+                      >
+                        <CategoryTermsPanel
+                          category={category}
+                          terms={categoryTerms}
+                          termStatus={termStatus}
+                          termConfidence={termConfidence}
+                          onClose={() => setSelectedCategory(null)}
+                          onSelectTerm={onSelectTerm}
+                        />
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
                 </article>
               );
             })}
+          </div>
+
+          <div className="hidden min-w-0 overflow-clip 2xl:block">
+            <AnimatePresence mode="popLayout">
+              {selectedCategory ? (
+                <motion.aside
+                  key={selectedCategory}
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 18 }}
+                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                  className="sticky top-20 max-h-[calc(100dvh-6rem)] min-w-0 overflow-hidden rounded-2xl border border-teal-400/25 bg-neutral-950/90 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
+                  aria-label={`Termos de ${selectedCategory}`}
+                >
+                  <CategoryTermsPanel
+                    category={selectedCategory}
+                    terms={selectedCategoryTerms}
+                    termStatus={termStatus}
+                    termConfidence={termConfidence}
+                    onClose={() => setSelectedCategory(null)}
+                    onSelectTerm={onSelectTerm}
+                  />
+                </motion.aside>
+              ) : null}
+            </AnimatePresence>
+          </div>
         </div>
       )}
     </div>
