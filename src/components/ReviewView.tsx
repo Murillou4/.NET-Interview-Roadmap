@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Award, ChevronRight, Clock, Flame } from 'lucide-react';
 import { StudyStatus, StudyTerm } from '../types';
+import { TechnicalText } from './TechnicalText';
 
 interface ReviewViewProps {
   terms: StudyTerm[];
@@ -76,9 +77,13 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
               ) : (
                 <AlertTriangle className="h-5 w-5 text-amber-300" />
               )}
-              <h3 className="text-pretty text-lg font-bold tracking-tight text-neutral-100">{title}</h3>
+              <TechnicalText as="h3" className="text-pretty text-lg font-bold tracking-tight text-neutral-100">
+                {title}
+              </TechnicalText>
             </div>
-            <p className="max-w-3xl text-pretty text-sm leading-6 text-neutral-400">{description}</p>
+            <TechnicalText as="p" className="max-w-3xl text-pretty text-sm leading-6 text-neutral-400">
+              {description}
+            </TechnicalText>
           </div>
 
           <div className="w-full rounded-2xl border border-white/[0.08] bg-neutral-950/80 px-4 py-3 md:w-40 md:shrink-0">
@@ -101,11 +106,11 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
             <h4 className="mt-4 text-sm font-semibold text-neutral-100">
               {subTab === 'revisar' ? 'Nenhum termo pendente de revisão.' : 'Nenhum termo com confiança baixa.'}
             </h4>
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-neutral-500">
+            <TechnicalText as="p" className="mx-auto mt-2 max-w-xl text-sm leading-6 text-neutral-500">
               {subTab === 'revisar'
                 ? 'Quando quiser separar um assunto para voltar depois, use o botão de revisão dentro do card do termo.'
                 : 'Se algo travar, marque a confiança em 1 ou 2 quando estiver no card do termo e ele volta para esta fila.'}
-            </p>
+            </TechnicalText>
           </div>
         ) : (
           <div className="mt-6 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
@@ -124,8 +129,12 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 space-y-1">
-                        <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
-                        <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
+                        <TechnicalText as="h4" className="text-sm font-bold text-neutral-100">
+                          {term.name}
+                        </TechnicalText>
+                        <TechnicalText as="p" className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
+                          {term.category}
+                        </TechnicalText>
                       </div>
 
                       <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
@@ -133,7 +142,9 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
                       </span>
                     </div>
 
-                    <p className="line-clamp-2 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
+                    <TechnicalText as="p" className="line-clamp-2 text-sm leading-6 text-neutral-400">
+                      {term.simpleExplanation}
+                    </TechnicalText>
                   </div>
 
                   <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-neutral-500">

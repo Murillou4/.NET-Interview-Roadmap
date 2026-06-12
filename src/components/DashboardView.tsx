@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { STUDY_CATEGORIES } from '../data/categories';
 import { StudyStatus, StudyTerm } from '../types';
+import { TechnicalText } from './TechnicalText';
 
 interface DashboardViewProps {
   terms: StudyTerm[];
@@ -95,9 +96,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Sessão atual
               </span>
               <div className="space-y-3">
-                <h2 className="max-w-3xl text-balance text-2xl font-extrabold leading-tight tracking-tight md:text-3xl">
+                <TechnicalText
+                  as="h2"
+                  className="max-w-3xl text-balance text-2xl font-extrabold leading-tight tracking-tight md:text-3xl"
+                >
                   Estudo de backend sem ruído
-                </h2>
+                </TechnicalText>
                 <p className="max-w-2xl text-pretty text-sm leading-6 text-neutral-400">
                   Abra um termo, marque o estado e siga adiante. O painel fica curto de propósito.
                 </p>
@@ -149,8 +153,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 space-y-2">
               <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">Próximo termo</p>
-              <h3 className="text-lg font-extrabold tracking-tight text-neutral-100">{recommendedTerm.name}</h3>
-              <p className="line-clamp-3 text-pretty text-sm leading-6 text-neutral-400">{recommendedTerm.simpleExplanation}</p>
+              <TechnicalText as="h3" className="text-lg font-extrabold tracking-tight text-neutral-100">
+                {recommendedTerm.name}
+              </TechnicalText>
+              <TechnicalText as="p" className="line-clamp-3 text-pretty text-sm leading-6 text-neutral-400">
+                {recommendedTerm.simpleExplanation}
+              </TechnicalText>
             </div>
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-400/10 text-teal-300">
               <Lightbulb className="h-5 w-5" />
@@ -159,7 +167,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="max-w-full rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-neutral-300">
-              {recommendedTerm.category}
+              <TechnicalText>{recommendedTerm.category}</TechnicalText>
             </span>
             <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-neutral-300">
               Nível {recommendedTerm.level}
@@ -217,7 +225,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="py-12 text-center">
               <Search className="mx-auto h-10 w-10 text-neutral-600" />
               <p className="mt-4 text-sm font-semibold text-neutral-200">Nenhum termo bateu com a busca.</p>
-              <p className="mt-2 text-sm text-neutral-500">Tente algo como class, async ou join.</p>
+              <TechnicalText as="p" className="mt-2 text-sm text-neutral-500">
+                Tente algo como class, async ou join.
+              </TechnicalText>
             </div>
           ) : (
             <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
@@ -234,14 +244,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 space-y-1">
-                          <h4 className="text-sm font-bold text-neutral-100">{term.name}</h4>
-                          <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
+                          <TechnicalText as="h4" className="text-sm font-bold text-neutral-100">
+                            {term.name}
+                          </TechnicalText>
+                          <TechnicalText as="p" className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
+                            {term.category}
+                          </TechnicalText>
                         </div>
                         <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
                           {status}
                         </span>
                       </div>
-                      <p className="line-clamp-3 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
+                      <TechnicalText as="p" className="line-clamp-3 text-sm leading-6 text-neutral-400">
+                        {term.simpleExplanation}
+                      </TechnicalText>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between text-xs text-neutral-500">
@@ -277,7 +293,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 space-y-1">
-                      <p className="text-pretty text-sm font-semibold leading-5 text-neutral-100">{category}</p>
+                      <TechnicalText as="p" className="text-pretty text-sm font-semibold leading-5 text-neutral-100">
+                        {category}
+                      </TechnicalText>
                       <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
                         {stats.learned}/{stats.total} termos
                       </p>
@@ -313,7 +331,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="flex flex-col gap-3 border-b border-white/[0.08] pb-4 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">Filtro ativo</p>
-                  <h4 className="text-pretty text-base font-bold text-neutral-100">{selectedCategory}</h4>
+                  <TechnicalText as="h4" className="text-pretty text-base font-bold text-neutral-100">
+                    {selectedCategory}
+                  </TechnicalText>
                 </div>
 
                 <button
@@ -340,15 +360,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0 space-y-1">
-                            <h5 className="text-sm font-bold text-neutral-100">{term.name}</h5>
-                            <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">{term.category}</p>
+                            <TechnicalText as="h5" className="text-sm font-bold text-neutral-100">
+                              {term.name}
+                            </TechnicalText>
+                            <TechnicalText as="p" className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
+                              {term.category}
+                            </TechnicalText>
                           </div>
                           <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
                             {status}
                           </span>
                         </div>
 
-                        <p className="line-clamp-2 text-sm leading-6 text-neutral-400">{term.simpleExplanation}</p>
+                        <TechnicalText as="p" className="line-clamp-2 text-sm leading-6 text-neutral-400">
+                          {term.simpleExplanation}
+                        </TechnicalText>
                       </div>
 
                       <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-neutral-500">

@@ -12,6 +12,7 @@ import {
   ThumbsUp,
 } from 'lucide-react';
 import { StudyStatus, StudyTerm } from '../types';
+import { TechnicalText } from './TechnicalText';
 
 interface TermDetailProps {
   term: StudyTerm;
@@ -89,13 +90,15 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                 {term.level}
               </span>
               <span className="rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-300">
-                {term.category}
+                <TechnicalText>{term.category}</TechnicalText>
               </span>
             </div>
 
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Termo em foco</p>
-              <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{term.name}</h2>
+              <TechnicalText as="h2" className="text-2xl font-extrabold tracking-tight md:text-3xl">
+                {term.name}
+              </TechnicalText>
               <p className="max-w-3xl text-sm leading-6 text-neutral-400">
                 Estude em blocos curtos. Cada aba mantém o conteúdo direto para não cansar no celular.
               </p>
@@ -187,17 +190,23 @@ export const TermDetail: React.FC<TermDetailProps> = ({
           <div className="space-y-4 animate-fadeIn">
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">1. O que é?</p>
-              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.simpleExplanation}</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-300">
+                {term.simpleExplanation}
+              </TechnicalText>
             </section>
 
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">2. Pra que serve?</p>
-              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.interviewExplanation}</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-300">
+                {term.interviewExplanation}
+              </TechnicalText>
             </section>
 
             <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Quando usar</p>
-              <p className="mt-3 text-sm leading-6 text-neutral-400">{term.whenToUse}</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-400">
+                {term.whenToUse}
+              </TechnicalText>
             </section>
           </div>
         ) : null}
@@ -206,7 +215,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
           <div className="space-y-4 animate-fadeIn">
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Pergunta comum</p>
-              <p className="mt-3 text-sm leading-6 text-neutral-200">{term.interviewQuestion}</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-200">
+                {term.interviewQuestion}
+              </TechnicalText>
             </section>
 
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
@@ -214,7 +225,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                 <ThumbsUp className="h-4 w-4 text-amber-300" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300">Resposta curta</p>
               </div>
-              <p className="mt-3 text-sm leading-6 italic text-neutral-300">"{term.shortInterviewAnswer}"</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 italic text-neutral-300">
+                {`"${term.shortInterviewAnswer}"`}
+              </TechnicalText>
             </section>
 
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
@@ -222,7 +235,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                 <Sparkles className="h-4 w-4 text-teal-300" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Resposta de impacto</p>
               </div>
-              <p className="mt-3 text-sm leading-6 text-neutral-300">{term.betterInterviewAnswer}</p>
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-300">
+                {term.betterInterviewAnswer}
+              </TechnicalText>
             </section>
 
             <section className="rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] p-5">
@@ -234,7 +249,7 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                 {term.commonErrors.map((error, index) => (
                   <li key={index} className="flex gap-2 leading-6">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300" />
-                    <span>{error}</span>
+                    <TechnicalText>{error}</TechnicalText>
                   </li>
                 ))}
               </ul>
@@ -247,7 +262,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
             <section className="rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-5">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Exemplo real</p>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">C# strongly typed</span>
+                <TechnicalText className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">
+                  C# strongly typed
+                </TechnicalText>
               </div>
               <pre className="mt-4 overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#071018] p-4 text-sm leading-6 text-teal-200">
                 <code>{term.practicalExample}</code>
@@ -256,10 +273,10 @@ export const TermDetail: React.FC<TermDetailProps> = ({
 
             <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">Leitura rápida</p>
-              <p className="mt-3 text-sm leading-6 text-neutral-400">
+              <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-400">
                 O exemplo acima mostra o caminho mais curto para apresentar o conceito sem enfeite. A ideia é fixar a
                 estrutura e não decorar a parede de boilerplate.
-              </p>
+              </TechnicalText>
             </section>
           </div>
         ) : null}
@@ -271,7 +288,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                 <HelpCircle className="h-5 w-5 text-teal-300" />
                 <h3 className="text-sm font-semibold text-neutral-100">Mini quiz</h3>
               </div>
-              <p className="mt-4 text-sm font-semibold leading-6 text-neutral-200">{term.quiz.question}</p>
+              <TechnicalText as="p" className="mt-4 text-sm font-semibold leading-6 text-neutral-200">
+                {term.quiz.question}
+              </TechnicalText>
 
               <div className="mt-5 space-y-3">
                 {term.quiz.options.map((option, index) => {
@@ -295,7 +314,7 @@ export const TermDetail: React.FC<TermDetailProps> = ({
                       disabled={quizAnswered}
                       className={`flex w-full items-center justify-between gap-3 rounded-2xl border p-4 text-left text-sm transition ${optionStyle}`}
                     >
-                      <span>{option}</span>
+                      <TechnicalText>{option}</TechnicalText>
                       {quizAnswered && index === term.quiz.answerIndex ? (
                         <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
                           Gabarito
@@ -309,7 +328,9 @@ export const TermDetail: React.FC<TermDetailProps> = ({
               {quizAnswered ? (
                 <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Explicação</p>
-                  <p className="mt-3 text-sm leading-6 text-neutral-300">{term.quiz.explanation}</p>
+                  <TechnicalText as="p" className="mt-3 text-sm leading-6 text-neutral-300">
+                    {term.quiz.explanation}
+                  </TechnicalText>
                   <div className="mt-4">
                     {selectedOption === term.quiz.answerIndex ? (
                       <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">

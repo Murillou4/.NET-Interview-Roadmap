@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { SIMULATOR_QUESTIONS } from '../data/simulator';
 import { SimulatorQuestion } from '../types';
+import { TechnicalText } from './TechnicalText';
 
 interface SimulatorViewProps {
   simulatorPerformance: Record<string, 'errei' | 'mais_ou_menos' | 'acertei'>;
@@ -151,7 +152,9 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
             <span className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
               Simulado técnico
             </span>
-            <p className="text-xs uppercase leading-5 tracking-[0.12em] text-neutral-500">Categoria: {currentQuestion.category}</p>
+            <p className="text-xs uppercase leading-5 tracking-[0.12em] text-neutral-500">
+              Categoria: <TechnicalText>{currentQuestion.category}</TechnicalText>
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -183,9 +186,9 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
             <HelpCircle className="h-4 w-4 text-teal-300" />
             <h3 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-300">Pergunta do entrevistador</h3>
           </div>
-          <p className="mt-3 text-lg font-bold leading-snug text-neutral-100 md:text-xl">
+          <TechnicalText as="p" className="mt-3 text-lg font-bold leading-snug text-neutral-100 md:text-xl">
             {currentQuestion.question}
-          </p>
+          </TechnicalText>
         </div>
 
         <div className="mt-5 space-y-2">
@@ -221,12 +224,16 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
           <div className="mt-5 space-y-4 border-t border-white/[0.08] pt-5">
             <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">Resposta curta</p>
-              <p className="mt-2 text-sm leading-6 text-neutral-200 italic">"{currentQuestion.idealShortAnswer}"</p>
+              <TechnicalText as="p" className="mt-2 text-sm leading-6 text-neutral-200 italic">
+                {`"${currentQuestion.idealShortAnswer}"`}
+              </TechnicalText>
             </div>
 
             <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300">Resposta completa</p>
-              <p className="mt-2 text-sm leading-6 text-neutral-300">{currentQuestion.idealCompleteAnswer}</p>
+              <TechnicalText as="p" className="mt-2 text-sm leading-6 text-neutral-300">
+                {currentQuestion.idealCompleteAnswer}
+              </TechnicalText>
             </div>
 
             <div className="rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-5">
@@ -235,7 +242,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
                 {currentQuestion.expectedPoints.map((point, index) => (
                   <li key={index} className="flex gap-2">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
-                    <span className="leading-6">{point}</span>
+                    <TechnicalText className="leading-6">{point}</TechnicalText>
                   </li>
                 ))}
               </ul>
@@ -300,9 +307,9 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
       </section>
 
       <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
-        <p className="text-center text-sm leading-6 text-neutral-500">
+        <TechnicalText as="p" className="text-center text-sm leading-6 text-neutral-500">
           Quer abrir a teoria deste assunto? Use a busca ou o roadmap e escolha o card do termo para continuar.
-        </p>
+        </TechnicalText>
         {relatedTermByQuestionId[currentQuestion.id] ? (
           <button
             type="button"

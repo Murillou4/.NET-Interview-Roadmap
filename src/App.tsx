@@ -7,6 +7,7 @@ import { DashboardView } from './components/DashboardView';
 import { RoadmapView } from './components/RoadmapView';
 import { SimulatorView } from './components/SimulatorView';
 import { ReviewView } from './components/ReviewView';
+import { TechnicalText } from './components/TechnicalText';
 import { STUDY_TERMS } from './data';
 import { getInitialProgress, saveProgress } from './utils/storage';
 import { StudyStatus, StudyTerm, UserProgress } from './types';
@@ -199,7 +200,7 @@ export default function App() {
               }`}
             >
               <Map className="h-5 w-5" />
-              <span>Roadmap</span>
+              <TechnicalText>Roadmap</TechnicalText>
             </button>
 
             <button

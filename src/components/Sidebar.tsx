@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, LayoutDashboard, Map, MessageSquareCode, Trophy } from 'lucide-react';
+import { TechnicalText } from './TechnicalText';
 
 interface SidebarProps {
   activeTab: 'dashboard' | 'roadmap' | 'simulator' | 'review';
@@ -59,7 +60,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">Painel</p>
-            <p className="mt-1 text-xl font-extrabold tracking-tight text-neutral-100">.NET Roadmap</p>
+            <TechnicalText as="p" className="mt-1 text-xl font-extrabold tracking-tight text-neutral-100">
+              .NET Roadmap
+            </TechnicalText>
           </div>
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-teal-400/20 bg-teal-400/10 text-teal-300">
             <Trophy className="h-5 w-5" />
@@ -106,7 +109,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
 
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold leading-tight">{item.label}</p>
+                  <TechnicalText as="p" className="text-sm font-semibold leading-tight">
+                    {item.label}
+                  </TechnicalText>
                   <p className="mt-1 text-xs leading-tight text-neutral-500">{item.desc}</p>
                 </div>
               </div>

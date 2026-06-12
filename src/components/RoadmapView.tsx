@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, CheckCircle, Compass, Lock, Unlock } from 'lucide-react';
 import { ROADMAP_STEPS } from '../data/categories';
 import { StudyStatus, StudyTerm } from '../types';
+import { TechnicalText } from './TechnicalText';
 
 interface RoadmapViewProps {
   terms: StudyTerm[];
@@ -32,7 +33,9 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
           </span>
           <div className="flex items-center gap-2">
             <Compass className="h-5 w-5 text-teal-300" />
-            <h2 className="text-balance text-xl font-extrabold tracking-tight md:text-2xl">Trilha evolutiva do C#</h2>
+            <TechnicalText as="h2" className="text-balance text-xl font-extrabold tracking-tight md:text-2xl">
+              Trilha evolutiva do C#
+            </TechnicalText>
           </div>
           <p className="max-w-3xl text-pretty text-sm leading-6 text-neutral-400">
             Estude em ordem curta. Cada etapa mostra o que abrir agora e quanto falta para fechar o bloco.
@@ -41,7 +44,9 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
 
         <div className="w-full rounded-2xl border border-white/[0.08] bg-neutral-950/80 p-4 lg:w-80 lg:shrink-0">
           <p className="text-[10px] uppercase tracking-[0.12em] text-neutral-500">Foco atual sugerido</p>
-          <p className="mt-2 text-sm font-semibold text-neutral-100">{nextTargetStep.title}</p>
+          <TechnicalText as="p" className="mt-2 text-sm font-semibold text-neutral-100">
+            {nextTargetStep.title}
+          </TechnicalText>
           <p className="mt-1 text-xs text-neutral-500">Tempo estimado: {nextTargetStep.recommendedDuration}</p>
         </div>
       </section>
@@ -103,8 +108,12 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
                       )}
                     </div>
 
-                    <h3 className="text-pretty text-lg font-bold tracking-tight text-neutral-100">{step.title}</h3>
-                    <p className="max-w-4xl text-pretty text-sm leading-6 text-neutral-400">{step.description}</p>
+                    <TechnicalText as="h3" className="text-pretty text-lg font-bold tracking-tight text-neutral-100">
+                      {step.title}
+                    </TechnicalText>
+                    <TechnicalText as="p" className="max-w-4xl text-pretty text-sm leading-6 text-neutral-400">
+                      {step.description}
+                    </TechnicalText>
                   </div>
 
                   <div className="w-full space-y-2 lg:w-44 lg:shrink-0">
@@ -151,7 +160,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ terms, termStatus, onS
                                     : 'border-white/[0.08] bg-neutral-950/70 text-neutral-300 hover:border-teal-400/25 hover:text-teal-300'
                             }`}
                           >
-                            {term.name}
+                            <TechnicalText>{term.name}</TechnicalText>
                             <span className="text-[10px] text-neutral-500">({term.level})</span>
                             {isStudied ? <ArrowRight className="h-3.5 w-3.5" /> : null}
                           </button>

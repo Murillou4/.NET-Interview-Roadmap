@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Search, Trophy, X } from 'lucide-react';
+import { TechnicalText } from './TechnicalText';
 
 interface HeaderProps {
   searchQuery: string;
@@ -27,9 +28,12 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="min-w-0 space-y-2">
               <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                <h1 className="min-w-0 basis-full text-balance text-lg font-extrabold leading-tight tracking-tight sm:basis-auto md:text-xl">
+                <TechnicalText
+                  as="h1"
+                  className="min-w-0 basis-full text-balance text-lg font-extrabold leading-tight tracking-tight sm:basis-auto md:text-xl"
+                >
                   .NET Interview Roadmap
-                </h1>
+                </TechnicalText>
                 <span className="rounded-full border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
                   Júnior a Pleno
                 </span>
