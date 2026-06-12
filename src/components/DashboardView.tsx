@@ -70,10 +70,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     terms.find((term) => !termStatus[term.id] || termStatus[term.id] === 'não estudado' || termStatus[term.id] === 'estudando') ||
     terms[0];
 
-  const currentCategoryTerms = selectedCategory
-    ? filteredTerms.filter((term) => term.category === selectedCategory)
-    : filteredTerms;
-
   const getCategoryStats = (category: string) => {
     const categoryTerms = terms.filter((term) => term.category === category);
     const learnedInCategory = categoryTerms.filter((term) => termStatus[term.id] === 'aprendido').length;
@@ -274,122 +270,118 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
         </section>
       ) : (
-        <div className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3">
             {STUDY_CATEGORIES.map((category) => {
               const stats = getCategoryStats(category);
               const isSelected = selectedCategory === category;
+              const categoryTerms = terms.filter((term) => term.category === category);
 
               return (
-                <button
+                <article
                   key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(isSelected ? null : category)}
-                  className={`min-h-[9.5rem] rounded-2xl border p-4 text-left transition duration-200 ${
+                  className={`overflow-hidden rounded-2xl border transition duration-200 ${
                     isSelected
-                      ? 'border-teal-400/25 bg-teal-400/10'
+                      ? 'border-teal-400/30 bg-teal-400/[0.08] shadow-[inset_0_1px_0_rgba(94,234,212,0.08)]'
                       : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.05]'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 space-y-1">
-                      <TechnicalText as="p" className="text-pretty text-sm font-semibold leading-5 text-neutral-100">
-                        {category}
-                      </TechnicalText>
-                      <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
-                        {stats.learned}/{stats.total} termos
-                      </p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory(isSelected ? null : category)}
+                    className="block min-h-[9.5rem] w-full p-4 text-left"
+                    aria-expanded={isSelected}
+                    aria-controls={`category-terms-${category}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-1">
+                        <TechnicalText as="p" className="text-pretty text-sm font-semibold leading-5 text-neutral-100">
+                          {category}
+                        </TechnicalText>
+                        <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
+                          {stats.learned}/{stats.total} termos
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
+                        {stats.percent}%
+                      </span>
                     </div>
-                    <span className="shrink-0 rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
-                      {stats.percent}%
-                    </span>
-                  </div>
 
-                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-900">
+                    <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-900">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          stats.percent === 100 ? 'bg-emerald-400' : stats.percent > 0 ? 'bg-teal-400' : 'bg-transparent'
+                        }`}
+                        style={{ width: `${stats.percent}%` }}
+                      />
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
+                      <span>{isSelected ? 'Termos exibidos abaixo' : 'Abrir conteúdo'}</span>
+                      <span className="inline-flex items-center gap-1 font-semibold text-teal-300">
+                        {isSelected ? 'Ocultar termos' : 'Ver termos'}
+                        <ChevronRight
+                          className={`h-3.5 w-3.5 transition-transform duration-200 ${isSelected ? 'rotate-90' : ''}`}
+                        />
+                      </span>
+                    </div>
+                  </button>
+
+                  {isSelected ? (
                     <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        stats.percent === 100 ? 'bg-emerald-400' : stats.percent > 0 ? 'bg-teal-400' : 'bg-transparent'
-                      }`}
-                      style={{ width: `${stats.percent}%` }}
-                    />
-                  </div>
+                      id={`category-terms-${category}`}
+                      className="border-t border-teal-400/15 bg-neutral-950/35 p-2 animate-fadeIn"
+                    >
+                      <p className="px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
+                        Escolha um termo para estudar
+                      </p>
 
-                  <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
-                    <span>Progresso</span>
-                    <span className="inline-flex items-center gap-1 text-teal-300">
-                      {isSelected ? 'Ocultar' : 'Ver termos'}
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </span>
-                  </div>
-                </button>
+                      <div className="space-y-1">
+                        {categoryTerms.map((term) => {
+                          const status = termStatus[term.id] || 'não estudado';
+                          const confidence = termConfidence[term.id] || 0;
+
+                          return (
+                            <button
+                              key={term.id}
+                              type="button"
+                              onClick={() => onSelectTerm(term)}
+                              className="group flex w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-white/[0.08] hover:bg-white/[0.05] active:scale-[0.99]"
+                            >
+                              <div className="min-w-0">
+                                <TechnicalText as="p" className="truncate text-sm font-semibold text-neutral-100">
+                                  {term.name}
+                                </TechnicalText>
+                                <p className="mt-1 line-clamp-1 text-xs leading-5 text-neutral-500">
+                                  {term.simpleExplanation}
+                                </p>
+                              </div>
+
+                              <div className="flex shrink-0 items-center gap-2">
+                                {confidence > 0 ? (
+                                  <span className="hidden text-[10px] font-mono text-neutral-500 lg:inline">
+                                    {confidence}/5
+                                  </span>
+                                ) : null}
+                                <span className={`h-2 w-2 rounded-full ${
+                                  status === 'aprendido'
+                                    ? 'bg-emerald-400'
+                                    : status === 'revisar'
+                                      ? 'bg-amber-300'
+                                      : status === 'estudando'
+                                        ? 'bg-teal-300'
+                                        : 'bg-neutral-700'
+                                }`} />
+                                <ChevronRight className="h-4 w-4 text-neutral-500 transition group-hover:translate-x-0.5 group-hover:text-teal-300" />
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                </article>
               );
             })}
-          </div>
-
-          {selectedCategory ? (
-            <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 md:p-6 xl:p-7">
-              <div className="flex flex-col gap-3 border-b border-white/[0.08] pb-4 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">Filtro ativo</p>
-                  <TechnicalText as="h4" className="text-pretty text-base font-bold text-neutral-100">
-                    {selectedCategory}
-                  </TechnicalText>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategory(null)}
-                  className="inline-flex items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-semibold text-neutral-300 transition hover:bg-white/[0.06]"
-                >
-                  Limpar filtro
-                </button>
-              </div>
-
-              <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-                {currentCategoryTerms.map((term) => {
-                  const status = termStatus[term.id] || 'não estudado';
-                  const confidence = termConfidence[term.id] || 0;
-
-                  return (
-                    <button
-                      key={term.id}
-                      type="button"
-                      onClick={() => onSelectTerm(term)}
-                      className="flex h-full min-h-[11.5rem] flex-col justify-between rounded-2xl border border-white/[0.08] bg-neutral-950/70 p-4 text-left transition hover:border-teal-400/25 hover:bg-white/[0.04]"
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 space-y-1">
-                            <TechnicalText as="h5" className="text-sm font-bold text-neutral-100">
-                              {term.name}
-                            </TechnicalText>
-                            <TechnicalText as="p" className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
-                              {term.category}
-                            </TechnicalText>
-                          </div>
-                          <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusStyles(status)}`}>
-                            {status}
-                          </span>
-                        </div>
-
-                        <TechnicalText as="p" className="line-clamp-2 text-sm leading-6 text-neutral-400">
-                          {term.simpleExplanation}
-                        </TechnicalText>
-                      </div>
-
-                      <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-neutral-500">
-                        <span className="font-mono uppercase">Nível {term.level}</span>
-                        <span className="inline-flex items-center gap-1 text-teal-300">
-                          {confidence > 0 ? `Confiança ${confidence}/5` : 'Abrir'}
-                          <ChevronRight className="h-3.5 w-3.5" />
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
         </div>
       )}
     </div>
