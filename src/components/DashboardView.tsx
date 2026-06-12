@@ -54,7 +54,7 @@ const CategoryTermsPanel: React.FC<CategoryTermsPanelProps> = ({
   onClose,
   onSelectTerm,
 }) => (
-  <div className="flex max-h-[calc(100dvh-6rem)] min-h-0 flex-col">
+  <div className="flex h-full max-h-[calc(100dvh-6rem)] min-h-0 flex-col">
     <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] px-4 py-4">
       <div className="min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-300">
@@ -160,6 +160,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const selectedCategoryTerms = selectedCategory
     ? terms.filter((term) => term.category === selectedCategory)
     : [];
+  const categoryRows = Array.from(
+    { length: Math.ceil(STUDY_CATEGORIES.length / 3) },
+    (_, index) => STUDY_CATEGORIES.slice(index * 3, index * 3 + 3),
+  );
 
   const getCategoryStats = (category: string) => {
     const categoryTerms = terms.filter((term) => term.category === category);
@@ -361,116 +365,140 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
         </section>
       ) : (
-        <div
-          className={`grid items-start gap-3 transition-[grid-template-columns] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] 2xl:grid-cols-[minmax(0,1fr)_0px] ${
-            selectedCategory ? '2xl:grid-cols-[minmax(0,1fr)_24rem]' : ''
-          }`}
-        >
-          <div className="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-            {STUDY_CATEGORIES.map((category) => {
-              const stats = getCategoryStats(category);
-              const isSelected = selectedCategory === category;
-              const categoryTerms = terms.filter((term) => term.category === category);
+        <div className="grid items-start gap-3 sm:grid-cols-2 2xl:block 2xl:space-y-3">
+          {categoryRows.map((categoryRow) => {
+            const selectedIndexInRow = selectedCategory
+              ? categoryRow.indexOf(selectedCategory)
+              : -1;
+            const panelColumn = selectedIndexInRow === 2 ? 2 : selectedIndexInRow + 2;
 
-              return (
-                <article
-                  key={category}
-                  className={`overflow-hidden rounded-2xl border transition duration-200 ${
-                    isSelected
-                      ? 'border-teal-400/30 bg-teal-400/[0.08] shadow-[inset_0_1px_0_rgba(94,234,212,0.08)]'
-                      : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.05]'
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategory(isSelected ? null : category)}
-                    className="block min-h-[9.5rem] w-full p-4 text-left"
-                    aria-expanded={isSelected}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 space-y-1">
-                        <TechnicalText as="p" className="text-pretty text-sm font-semibold leading-5 text-neutral-100">
-                          {category}
-                        </TechnicalText>
-                        <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
-                          {stats.learned}/{stats.total} termos
-                        </p>
-                      </div>
-                      <span className="shrink-0 rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
-                        {stats.percent}%
-                      </span>
-                    </div>
+            return (
+              <motion.div
+                layout="position"
+                key={categoryRow[0]}
+                className="contents 2xl:grid 2xl:grid-cols-3 2xl:items-start 2xl:gap-3"
+                transition={{ layout: { type: 'spring', stiffness: 320, damping: 34, mass: 0.75 } }}
+              >
+                {categoryRow.map((category, categoryIndex) => {
+                  const stats = getCategoryStats(category);
+                  const isSelected = selectedCategory === category;
+                  const categoryTerms = terms.filter((term) => term.category === category);
+                  const columnClass =
+                    categoryIndex === 0
+                      ? '2xl:col-start-1'
+                      : categoryIndex === 1
+                        ? '2xl:col-start-2'
+                        : '2xl:col-start-3';
+                  const isDisplaced =
+                    selectedIndexInRow >= 0 &&
+                    categoryIndex + 1 === panelColumn &&
+                    !isSelected;
 
-                    <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-900">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          stats.percent === 100 ? 'bg-emerald-400' : stats.percent > 0 ? 'bg-teal-400' : 'bg-transparent'
-                        }`}
-                        style={{ width: `${stats.percent}%` }}
-                      />
-                    </div>
-
-                    <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
-                      <span>{isSelected ? 'Painel aberto' : 'Abrir conteúdo'}</span>
-                      <span className="inline-flex items-center gap-1 font-semibold text-teal-300">
-                        {isSelected ? 'Fechar' : 'Ver termos'}
-                        <ChevronRight
-                          className={`h-3.5 w-3.5 transition-transform duration-300 ${isSelected ? 'rotate-180' : ''}`}
-                        />
-                      </span>
-                    </div>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isSelected ? (
-                      <motion.div
-                        key={`mobile-${category}`}
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="border-t border-teal-400/15 bg-neutral-950/35 2xl:hidden"
+                  return (
+                    <motion.article
+                      layout="position"
+                      key={category}
+                      className={`${columnClass} ${
+                        isDisplaced ? '2xl:row-start-2' : '2xl:row-start-1'
+                      } overflow-hidden rounded-2xl border transition-colors duration-200 ${
+                        isSelected
+                          ? 'border-teal-400/30 bg-teal-400/[0.08] shadow-[inset_0_1px_0_rgba(94,234,212,0.08)]'
+                          : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.12] hover:bg-white/[0.05]'
+                      }`}
+                      transition={{ layout: { type: 'spring', stiffness: 340, damping: 34, mass: 0.7 } }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCategory(isSelected ? null : category)}
+                        className="block min-h-[9.5rem] w-full p-4 text-left"
+                        aria-expanded={isSelected}
                       >
-                        <CategoryTermsPanel
-                          category={category}
-                          terms={categoryTerms}
-                          termStatus={termStatus}
-                          termConfidence={termConfidence}
-                          onClose={() => setSelectedCategory(null)}
-                          onSelectTerm={onSelectTerm}
-                        />
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
-                </article>
-              );
-            })}
-          </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 space-y-1">
+                            <TechnicalText as="p" className="text-pretty text-sm font-semibold leading-5 text-neutral-100">
+                              {category}
+                            </TechnicalText>
+                            <p className="text-[11px] uppercase leading-4 tracking-[0.1em] text-neutral-500">
+                              {stats.learned}/{stats.total} termos
+                            </p>
+                          </div>
+                          <span className="shrink-0 rounded-full border border-white/[0.08] bg-neutral-950/70 px-2.5 py-1 text-[10px] font-semibold tabular-nums text-neutral-300">
+                            {stats.percent}%
+                          </span>
+                        </div>
 
-          <div className="hidden min-w-0 overflow-clip 2xl:block">
-            <AnimatePresence mode="popLayout">
-              {selectedCategory ? (
-                <motion.aside
-                  key={selectedCategory}
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 18 }}
-                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                  className="sticky top-20 max-h-[calc(100dvh-6rem)] min-w-0 overflow-hidden rounded-2xl border border-teal-400/25 bg-neutral-950/90 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur"
-                  aria-label={`Termos de ${selectedCategory}`}
-                >
-                  <CategoryTermsPanel
-                    category={selectedCategory}
-                    terms={selectedCategoryTerms}
-                    termStatus={termStatus}
-                    termConfidence={termConfidence}
-                    onClose={() => setSelectedCategory(null)}
-                    onSelectTerm={onSelectTerm}
-                  />
-                </motion.aside>
-              ) : null}
-            </AnimatePresence>
-          </div>
+                        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-900">
+                          <div
+                            className={`h-full rounded-full transition-all duration-300 ${
+                              stats.percent === 100 ? 'bg-emerald-400' : stats.percent > 0 ? 'bg-teal-400' : 'bg-transparent'
+                            }`}
+                            style={{ width: `${stats.percent}%` }}
+                          />
+                        </div>
+
+                        <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
+                          <span>{isSelected ? 'Painel aberto' : 'Abrir conteúdo'}</span>
+                          <span className="inline-flex items-center gap-1 font-semibold text-teal-300">
+                            {isSelected ? 'Fechar' : 'Ver termos'}
+                            <ChevronRight
+                              className={`h-3.5 w-3.5 transition-transform duration-300 ${isSelected ? 'rotate-180' : ''}`}
+                            />
+                          </span>
+                        </div>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isSelected ? (
+                          <motion.div
+                            key={`mobile-${category}`}
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="border-t border-teal-400/15 bg-neutral-950/35 2xl:hidden"
+                          >
+                            <CategoryTermsPanel
+                              category={category}
+                              terms={categoryTerms}
+                              termStatus={termStatus}
+                              termConfidence={termConfidence}
+                              onClose={() => setSelectedCategory(null)}
+                              onSelectTerm={onSelectTerm}
+                            />
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </motion.article>
+                  );
+                })}
+
+                <AnimatePresence>
+                  {selectedIndexInRow >= 0 && selectedCategory ? (
+                    <motion.aside
+                      key={`desktop-${selectedCategory}`}
+                      initial={{ opacity: 0, x: selectedIndexInRow === 2 ? -18 : 18 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: selectedIndexInRow === 2 ? -12 : 12 }}
+                      transition={{ duration: 0.34, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      className={`hidden h-[22rem] min-w-0 overflow-hidden rounded-2xl border border-teal-400/25 bg-neutral-950/90 shadow-[0_14px_40px_rgba(0,0,0,0.22)] backdrop-blur 2xl:row-start-1 2xl:block ${
+                        panelColumn === 2 ? '2xl:col-start-2' : '2xl:col-start-3'
+                      }`}
+                      aria-label={`Termos de ${selectedCategory}`}
+                    >
+                      <CategoryTermsPanel
+                        category={selectedCategory}
+                        terms={selectedCategoryTerms}
+                        termStatus={termStatus}
+                        termConfidence={termConfidence}
+                        onClose={() => setSelectedCategory(null)}
+                        onSelectTerm={onSelectTerm}
+                      />
+                    </motion.aside>
+                  ) : null}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
