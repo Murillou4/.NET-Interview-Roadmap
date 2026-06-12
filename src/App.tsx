@@ -30,7 +30,6 @@ export default function App() {
   const difficultCount = STUDY_TERMS.filter(
     (term) => progress.termConfidence[term.id] === 1 || progress.termConfidence[term.id] === 2,
   ).length;
-  const progressPercent = totalCount > 0 ? Math.round((learnedCount / totalCount) * 100) : 0;
 
   const updateStatus = (termId: string, newStatus: StudyStatus) => {
     setProgress((current) => ({
@@ -107,9 +106,6 @@ export default function App() {
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        learnedCount={learnedCount}
-        totalCount={totalCount}
-        percent={progressPercent}
       />
 
       <div className="flex min-h-0 flex-1">
