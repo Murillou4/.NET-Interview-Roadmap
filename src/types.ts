@@ -46,4 +46,7 @@ export interface UserProgress {
   termStatus: Record<string, StudyStatus>;
   termConfidence: Record<string, number>; // 1 to 5
   simulatorPerformance: Record<string, 'errei' | 'mais_ou_menos' | 'acertei'>;
+  simulatorDrafts: Record<string, string>;
+  simulatorCurrentQuestionId: string | null;
 }
+

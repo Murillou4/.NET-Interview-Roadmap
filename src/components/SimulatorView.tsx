@@ -12,24 +12,32 @@ import {
   XCircle,
 } from 'lucide-react';
 import { SIMULATOR_QUESTIONS } from '../data/simulator';
-import { SimulatorQuestion } from '../types';
 import { TechnicalText } from './TechnicalText';
 
 interface SimulatorViewProps {
   simulatorPerformance: Record<string, 'errei' | 'mais_ou_menos' | 'acertei'>;
+  simulatorDrafts: Record<string, string>;
+  simulatorCurrentQuestionId: string | null;
   onUpdatePerformance: (questionId: string, performance: 'errei' | 'mais_ou_menos' | 'acertei') => void;
+  onUpdateDraft: (questionId: string, draft: string) => void;
+  onUpdateCurrentQuestion: (questionId: string) => void;
   onResetPerformance: () => void;
   onSelectTermById: (termId: string) => void;
 }
 
 export const SimulatorView: React.FC<SimulatorViewProps> = ({
   simulatorPerformance,
+  simulatorDrafts,
+  simulatorCurrentQuestionId,
   onUpdatePerformance,
+  onUpdateDraft,
+  onUpdateCurrentQuestion,
   onResetPerformance,
   onSelectTermById,
 }) => {
-  const [currentQuestion, setCurrentQuestion] = useState<SimulatorQuestion>(SIMULATOR_QUESTIONS[0]);
-  const [userDraft, setUserDraft] = useState('');
+  const currentQuestion =
+    SIMULATOR_QUESTIONS.find((question) => question.id === simulatorCurrentQuestionId) || SIMULATOR_QUESTIONS[0];
+  const userDraft = simulatorDrafts[currentQuestion.id] || '';
   const [showAnswer, setShowAnswer] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
   const relatedTermByQuestionId: Record<string, string> = {
@@ -76,8 +84,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
       nextQuestion = remainingQuestions[Math.floor(Math.random() * remainingQuestions.length)];
     }
 
-    setCurrentQuestion(nextQuestion);
-    setUserDraft('');
+    onUpdateCurrentQuestion(nextQuestion.id);
     setShowAnswer(false);
     setLastAction(null);
   };
@@ -92,7 +99,6 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
   const handleResetScores = () => {
     if (window.confirm('Deseja mesmo apagar o histórico do simulado?')) {
       onResetPerformance();
-      setUserDraft('');
       setShowAnswer(false);
       setLastAction(null);
     }
@@ -201,7 +207,9 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
 
           <textarea
             value={userDraft}
-            onChange={(event) => setUserDraft(event.target.value)}
+            onChange={(event) => {
+              onUpdateDraft(currentQuestion.id, event.target.value);
+            }}
             disabled={showAnswer}
             placeholder="Rascunhe aqui os termos que você diria na entrevista..."
             rows={5}

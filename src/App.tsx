@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, LayoutDashboard, Map, MessageSquareCode } from 'lucide-react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -10,6 +10,18 @@ import { ReviewView } from './components/ReviewView';
 import { TechnicalText } from './components/TechnicalText';
 import { STUDY_TERMS } from './data';
 import { getInitialProgress, saveProgress } from './utils/storage';
+import {
+  applySyncPayload,
+  createSyncPayload,
+  DriveSyncSession,
+  findDriveSyncFile,
+  isGoogleDriveSyncConfigured,
+  mergeSyncPayload,
+  requestDriveSyncSession,
+  revokeDriveSyncSession,
+  savePreRestoreBackup,
+  uploadDriveSyncFile,
+} from './utils/googleDriveSync';
 import { StudyStatus, StudyTerm, UserProgress } from './types';
 
 type ActiveTab = 'dashboard' | 'roadmap' | 'simulator' | 'review';
@@ -19,10 +31,78 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTerm, setSelectedTerm] = useState<StudyTerm | null>(null);
   const [progress, setProgress] = useState<UserProgress>(getInitialProgress());
+  const [driveSyncSession, setDriveSyncSession] = useState<DriveSyncSession | null>(null);
+  const [driveSyncFileId, setDriveSyncFileId] = useState<string | null>(null);
+  const [driveSyncStatus, setDriveSyncStatus] = useState(
+    isGoogleDriveSyncConfigured()
+      ? 'Conecte para levar seu progresso para outros dispositivos.'
+      : 'Sync desativado: configure VITE_GOOGLE_CLIENT_ID.',
+  );
+  const [driveSyncBusy, setDriveSyncBusy] = useState(false);
+  const skipNextDriveUpload = useRef(false);
 
   useEffect(() => {
     saveProgress(progress);
   }, [progress]);
+
+  useEffect(() => {
+    if (!driveSyncSession || !driveSyncFileId) return;
+
+    if (skipNextDriveUpload.current) {
+      skipNextDriveUpload.current = false;
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      uploadDriveSyncFile(driveSyncSession, driveSyncFileId, createSyncPayload(progress))
+        .then(() => setDriveSyncStatus('Progresso salvo no Google Drive.'))
+        .catch((error) => {
+          console.error('Erro ao salvar no Google Drive', error);
+          setDriveSyncStatus('Não foi possível salvar no Google Drive.');
+        });
+    }, 600);
+
+    return () => window.clearTimeout(timeout);
+  }, [driveSyncFileId, driveSyncSession, progress]);
+
+  const connectDriveSync = async () => {
+    setDriveSyncBusy(true);
+    setDriveSyncStatus('Conectando ao Google Drive...');
+
+    try {
+      const session = await requestDriveSyncSession();
+      const remoteFile = await findDriveSyncFile(session);
+
+      if (remoteFile.data) {
+        const localPayload = createSyncPayload(progress);
+        savePreRestoreBackup(localPayload);
+        const mergedPayload = mergeSyncPayload(localPayload, remoteFile.data);
+        skipNextDriveUpload.current = true;
+        const syncedProgress = applySyncPayload(mergedPayload);
+        setProgress(syncedProgress);
+        await uploadDriveSyncFile(session, remoteFile.fileId, mergedPayload);
+        setDriveSyncStatus('Dados locais e do Google Drive mesclados com backup de segurança.');
+      } else {
+        await uploadDriveSyncFile(session, remoteFile.fileId, createSyncPayload(progress));
+        setDriveSyncStatus('Progresso local enviado para o Google Drive.');
+      }
+
+      setDriveSyncSession(session);
+      setDriveSyncFileId(remoteFile.fileId);
+    } catch (error) {
+      console.error('Erro no sync com Google Drive', error);
+      setDriveSyncStatus(error instanceof Error ? error.message : 'Falha ao conectar com Google Drive.');
+    } finally {
+      setDriveSyncBusy(false);
+    }
+  };
+
+  const disconnectDriveSync = () => {
+    revokeDriveSyncSession(driveSyncSession);
+    setDriveSyncSession(null);
+    setDriveSyncFileId(null);
+    setDriveSyncStatus('Desconectado. Seus dados continuam salvos neste navegador.');
+  };
 
   const totalCount = STUDY_TERMS.length;
   const learnedCount = STUDY_TERMS.filter((term) => progress.termStatus[term.id] === 'aprendido').length;
@@ -65,6 +145,25 @@ export default function App() {
     setProgress((current) => ({
       ...current,
       simulatorPerformance: {},
+      simulatorDrafts: {},
+      simulatorCurrentQuestionId: null,
+    }));
+  };
+
+  const updateSimulatorDraft = (questionId: string, draft: string) => {
+    setProgress((current) => ({
+      ...current,
+      simulatorDrafts: {
+        ...current.simulatorDrafts,
+        [questionId]: draft,
+      },
+    }));
+  };
+
+  const updateSimulatorCurrentQuestion = (questionId: string) => {
+    setProgress((current) => ({
+      ...current,
+      simulatorCurrentQuestionId: questionId,
     }));
   };
 
@@ -106,6 +205,12 @@ export default function App() {
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        driveSyncConfigured={isGoogleDriveSyncConfigured()}
+        driveSyncConnected={Boolean(driveSyncSession)}
+        driveSyncStatus={driveSyncStatus}
+        driveSyncBusy={driveSyncBusy}
+        onConnectDriveSync={connectDriveSync}
+        onDisconnectDriveSync={disconnectDriveSync}
       />
 
       <div className="flex min-h-0 flex-1">
@@ -154,7 +259,11 @@ export default function App() {
                 {activeTab === 'simulator' && (
                   <SimulatorView
                     simulatorPerformance={progress.simulatorPerformance}
+                    simulatorDrafts={progress.simulatorDrafts}
+                    simulatorCurrentQuestionId={progress.simulatorCurrentQuestionId}
                     onUpdatePerformance={updatePerformance}
+                    onUpdateDraft={updateSimulatorDraft}
+                    onUpdateCurrentQuestion={updateSimulatorCurrentQuestion}
                     onResetPerformance={resetSimulatorPerformance}
                     onSelectTermById={selectTermById}
                   />

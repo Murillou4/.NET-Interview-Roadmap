@@ -1,16 +1,18 @@
-import { UserProgress, StudyStatus } from '../types';
+import { UserProgress } from '../types';
 
-const STORAGE_KEY = 'dotnet_interview_roadmap_progress';
+export const PROGRESS_STORAGE_KEY = 'dotnet_interview_roadmap_progress';
 
 export const getInitialProgress = (): UserProgress => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(PROGRESS_STORAGE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
       return {
         termStatus: parsed.termStatus || {},
         termConfidence: parsed.termConfidence || {},
-        simulatorPerformance: parsed.simulatorPerformance || {}
+        simulatorPerformance: parsed.simulatorPerformance || {},
+        simulatorDrafts: parsed.simulatorDrafts || {},
+        simulatorCurrentQuestionId: parsed.simulatorCurrentQuestionId || null,
       };
     }
   } catch (e) {
@@ -19,13 +21,15 @@ export const getInitialProgress = (): UserProgress => {
   return {
     termStatus: {},
     termConfidence: {},
-    simulatorPerformance: {}
+    simulatorPerformance: {},
+    simulatorDrafts: {},
+    simulatorCurrentQuestionId: null,
   };
 };
 
 export const saveProgress = (progress: UserProgress) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
   } catch (e) {
     console.error('Error saving localStorage progress', e);
   }
