@@ -9,7 +9,7 @@ Um app de estudo para revisar C# e .NET com trilha, roadmap, simulador e foco em
 
 ## Sincronização com Google Drive
 
-O app pode salvar o progresso completo do usuário no Google Drive usando a pasta privada `appDataFolder`, incluindo status dos termos, nota de confiança, desempenho do simulado e outros dados presentes no `localStorage` do app.
+O app pode salvar o progresso completo do usuário no Google Drive usando a pasta privada `appDataFolder`, incluindo status dos termos, nota de confiança, desempenho do simulado, rascunhos do simulado, pergunta atual e outros dados presentes no `localStorage` do app.
 
 Para ativar localmente:
 
@@ -18,7 +18,7 @@ Para ativar localmente:
 3. Copie `.env.example` para `.env.local` e preencha `VITE_GOOGLE_CLIENT_ID`.
 4. Reinicie o Vite e use o botão **Google Drive** no cabeçalho.
 
-Sem `VITE_GOOGLE_CLIENT_ID`, o app continua funcionando somente com `localStorage`.
+Ao conectar em um Drive que já possui dados, o app mescla os dados locais com os remotos e guarda um backup local antes de restaurar, reduzindo o risco de sobrescrever progresso importante. Sem `VITE_GOOGLE_CLIENT_ID`, o app continua funcionando somente com `localStorage`.
 
 ## Build
 

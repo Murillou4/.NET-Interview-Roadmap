@@ -16,8 +16,10 @@ import {
   DriveSyncSession,
   findDriveSyncFile,
   isGoogleDriveSyncConfigured,
+  mergeSyncPayload,
   requestDriveSyncSession,
   revokeDriveSyncSession,
+  savePreRestoreBackup,
   uploadDriveSyncFile,
 } from './utils/googleDriveSync';
 import { StudyStatus, StudyTerm, UserProgress } from './types';
@@ -72,10 +74,14 @@ export default function App() {
       const remoteFile = await findDriveSyncFile(session);
 
       if (remoteFile.data) {
+        const localPayload = createSyncPayload(progress);
+        savePreRestoreBackup(localPayload);
+        const mergedPayload = mergeSyncPayload(localPayload, remoteFile.data);
         skipNextDriveUpload.current = true;
-        const syncedProgress = applySyncPayload(remoteFile.data);
+        const syncedProgress = applySyncPayload(mergedPayload);
         setProgress(syncedProgress);
-        setDriveSyncStatus('Dados restaurados do Google Drive.');
+        await uploadDriveSyncFile(session, remoteFile.fileId, mergedPayload);
+        setDriveSyncStatus('Dados locais e do Google Drive mesclados com backup de segurança.');
       } else {
         await uploadDriveSyncFile(session, remoteFile.fileId, createSyncPayload(progress));
         setDriveSyncStatus('Progresso local enviado para o Google Drive.');
@@ -139,6 +145,25 @@ export default function App() {
     setProgress((current) => ({
       ...current,
       simulatorPerformance: {},
+      simulatorDrafts: {},
+      simulatorCurrentQuestionId: null,
+    }));
+  };
+
+  const updateSimulatorDraft = (questionId: string, draft: string) => {
+    setProgress((current) => ({
+      ...current,
+      simulatorDrafts: {
+        ...current.simulatorDrafts,
+        [questionId]: draft,
+      },
+    }));
+  };
+
+  const updateSimulatorCurrentQuestion = (questionId: string) => {
+    setProgress((current) => ({
+      ...current,
+      simulatorCurrentQuestionId: questionId,
     }));
   };
 
@@ -234,7 +259,11 @@ export default function App() {
                 {activeTab === 'simulator' && (
                   <SimulatorView
                     simulatorPerformance={progress.simulatorPerformance}
+                    simulatorDrafts={progress.simulatorDrafts}
+                    simulatorCurrentQuestionId={progress.simulatorCurrentQuestionId}
                     onUpdatePerformance={updatePerformance}
+                    onUpdateDraft={updateSimulatorDraft}
+                    onUpdateCurrentQuestion={updateSimulatorCurrentQuestion}
                     onResetPerformance={resetSimulatorPerformance}
                     onSelectTermById={selectTermById}
                   />

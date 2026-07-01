@@ -10,7 +10,9 @@ export const getInitialProgress = (): UserProgress => {
       return {
         termStatus: parsed.termStatus || {},
         termConfidence: parsed.termConfidence || {},
-        simulatorPerformance: parsed.simulatorPerformance || {}
+        simulatorPerformance: parsed.simulatorPerformance || {},
+        simulatorDrafts: parsed.simulatorDrafts || {},
+        simulatorCurrentQuestionId: parsed.simulatorCurrentQuestionId || null,
       };
     }
   } catch (e) {
@@ -19,7 +21,9 @@ export const getInitialProgress = (): UserProgress => {
   return {
     termStatus: {},
     termConfidence: {},
-    simulatorPerformance: {}
+    simulatorPerformance: {},
+    simulatorDrafts: {},
+    simulatorCurrentQuestionId: null,
   };
 };
 

@@ -7,6 +7,7 @@ const DRIVE_SYNC_FILE_NAME = 'dotnet-interview-roadmap-sync.json';
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILES_URL = 'https://www.googleapis.com/drive/v3/files';
 const DRIVE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files';
+const LOCAL_BACKUP_STORAGE_KEY = 'dotnet_interview_roadmap_pre_drive_restore_backup';
 
 interface GoogleTokenResponse {
   access_token?: string;
@@ -60,12 +61,16 @@ const createEmptyProgress = (): UserProgress => ({
   termStatus: {},
   termConfidence: {},
   simulatorPerformance: {},
+  simulatorDrafts: {},
+  simulatorCurrentQuestionId: null,
 });
 
 const normalizeProgress = (progress?: Partial<UserProgress> | null): UserProgress => ({
   termStatus: progress?.termStatus || {},
   termConfidence: progress?.termConfidence || {},
   simulatorPerformance: progress?.simulatorPerformance || {},
+  simulatorDrafts: progress?.simulatorDrafts || {},
+  simulatorCurrentQuestionId: progress?.simulatorCurrentQuestionId || null,
 });
 
 const getClientId = () => import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
@@ -160,7 +165,7 @@ export const createSyncPayload = (progress: UserProgress): DriveSyncFile => {
 
   for (let index = 0; index < localStorage.length; index += 1) {
     const key = localStorage.key(index);
-    if (!key || key === PROGRESS_STORAGE_KEY) continue;
+    if (!key || key === PROGRESS_STORAGE_KEY || key === LOCAL_BACKUP_STORAGE_KEY) continue;
     const value = localStorage.getItem(key);
     if (value !== null) localStorageSnapshot[key] = value;
   }
@@ -171,6 +176,46 @@ export const createSyncPayload = (progress: UserProgress): DriveSyncFile => {
     progress: normalizeProgress(progress),
     localStorage: localStorageSnapshot,
   };
+};
+
+export const mergeProgress = (localProgress: UserProgress, remoteProgress: UserProgress): UserProgress => {
+  const normalizedLocal = normalizeProgress(localProgress);
+  const normalizedRemote = normalizeProgress(remoteProgress);
+
+  return {
+    termStatus: {
+      ...normalizedRemote.termStatus,
+      ...normalizedLocal.termStatus,
+    },
+    termConfidence: {
+      ...normalizedRemote.termConfidence,
+      ...normalizedLocal.termConfidence,
+    },
+    simulatorPerformance: {
+      ...normalizedRemote.simulatorPerformance,
+      ...normalizedLocal.simulatorPerformance,
+    },
+    simulatorDrafts: {
+      ...normalizedRemote.simulatorDrafts,
+      ...normalizedLocal.simulatorDrafts,
+    },
+    simulatorCurrentQuestionId:
+      normalizedLocal.simulatorCurrentQuestionId || normalizedRemote.simulatorCurrentQuestionId || null,
+  };
+};
+
+export const mergeSyncPayload = (localPayload: DriveSyncFile, remotePayload: DriveSyncFile): DriveSyncFile => ({
+  version: 1,
+  updatedAt: new Date().toISOString(),
+  progress: mergeProgress(localPayload.progress, remotePayload.progress),
+  localStorage: {
+    ...(remotePayload.localStorage || {}),
+    ...(localPayload.localStorage || {}),
+  },
+});
+
+export const savePreRestoreBackup = (payload: DriveSyncFile) => {
+  localStorage.setItem(LOCAL_BACKUP_STORAGE_KEY, JSON.stringify(payload));
 };
 
 export const applySyncPayload = (payload: DriveSyncFile): UserProgress => {
